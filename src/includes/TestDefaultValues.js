@@ -1,4 +1,6 @@
 const TestDefaultValues = {
+  apiurl_nodes: 'http://psgui.qalab.geant.org/api/nodes',
+  apiurl_run: 'http://psgui.qalab.geant.org/api/runm',
   tests: [
     'throughput',
     'latency',

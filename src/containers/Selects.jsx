@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import '../App.css';
+import TestDefaultValues from '../includes/TestDefaultValues.js';
 import Select from 'react-select';
 import { Button } from 'react-bootstrap';
 
@@ -94,8 +95,8 @@ class Selects extends Component {
   };
 
   componentDidMount() {
-
-    fetch("http://localhost:5000/api/nodes")
+    let apiurl = TestDefaultValues.apiurl_nodes;
+    fetch(apiurl)
       .then(res => res.json())
       .then(
         (items) => {

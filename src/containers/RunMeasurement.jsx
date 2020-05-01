@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import '../App.css';
+import TestDefaultValues from '../includes/TestDefaultValues.js';
 import TestParams from '../containers/TestParams';
 import Selects from '../containers/Selects';
 import { Button } from 'react-bootstrap';
@@ -87,7 +88,8 @@ class RunMeasurement extends Component {
   handleSubmit = event => {
     this.setState({fetchLoading: true});
 
-    fetch('http://127.0.0.1:5000/api/runm', {
+    let apiurl = TestDefaultValues.apiurl_run;
+    fetch(apiurl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.state.formData)
