@@ -1,6 +1,6 @@
 const TestDefaultValues = {
-  apiurl_nodes: 'http://psgui.qalab.geant.org/api/nodes',
-  apiurl_run: 'http://psgui.qalab.geant.org/api/runm',
+  apiurl_nodes: 'http://127.0.0.1:5000/api/nodes',
+  apiurl_run: 'http://127.0.0.1:5000/api/runm',
   tests: [
     'throughput',
     'latency',
@@ -10,6 +10,7 @@ const TestDefaultValues = {
   defaultparams: {
     general: {
       default_test: 'trace',
+      default_ipversion: '4',
     },
     latency: {
       packet_count: 100,

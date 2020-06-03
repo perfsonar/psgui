@@ -6,6 +6,7 @@ import Latency from '../containers/Latency';
 import Throughput from '../containers/Throughput';
 import Rtt from '../containers/Rtt';
 import Trace from '../containers/Trace';
+import {RadioGroup, Radio} from 'react-radio-group'
 
 const options = TestDefaultValues.tests.map(item => ({ label: item,  value: item}));
 
@@ -20,7 +21,8 @@ class TestParams extends Component {
 
     this.state = {
       testoptions: options,
-      testOption: options.filter(option => option.value === test)[0]
+      testOption: options.filter(option => option.value === test)[0],
+      ipVersion: TestDefaultValues.defaultparams.general.default_ipversion
     };
 
     this.handleTestChange = this.handleTestChange.bind(this);
@@ -43,6 +45,13 @@ class TestParams extends Component {
       testOption
     });
     this.props.handleformdatachange('select-test', testOption.value);
+  };
+
+  handleIPVersionChange = async value => {
+    await this.setState({
+      ipVersion: value
+    });
+    this.props.handleformdatachange('select-ipversion', value);
   };
 
   renderSelectedTest(param) {
@@ -95,6 +104,14 @@ class TestParams extends Component {
                     options= { testoptions }
                     onChange={this.handleTestChange}
                     value={ testOption } />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <RadioGroup name="ipversion" selectedValue={this.state.ipVersion} onChange={this.handleIPVersionChange}>
+                      <Radio value="4" className="inlinerow" /> IPv4
+                      <Radio value="6" className="inlinerow" /> IPv6
+                  </RadioGroup>
                 </div>
               </div>
               {this.renderSelectedTest(testOption)}
