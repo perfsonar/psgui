@@ -6,13 +6,29 @@ import Selects from '../containers/Selects';
 import { Button } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
 
-  const ResultDiv = (props) => {
+let abortController;
+export { abortController };
+
+const ResultDiv = (props) => {
+  return (
+    <div className='result'>
+      <a href={props.item}>{props.item}</a>
+    </div>
+  );
+}
+
+class LoaderText extends Component {
+  render() {
     return (
-      <div className='result'>
-        <a href={props.item}>{props.item}</a>
-      </div>
+      <Button
+        type="button"
+        onClick={this.props.abfetch}
+        variant="secondary">
+        Cancel
+      </Button>
     );
   }
+}
 
 class RunMeasurement extends Component {
 
@@ -85,12 +101,21 @@ class RunMeasurement extends Component {
     }
   }
 
+  abortFetching = async () => {
+    console.log('Aborting...');
+    abortController.abort();
+    await this.setState({
+      fetchLoading: false,
+    });
+  }
+
   handleSubmit = event => {
     this.setState({fetchLoading: true});
-
+    abortController = new AbortController();
     let apiurl = TestDefaultValues.apiurl_run;
     fetch(apiurl, {
         method: 'POST',
+        signal: abortController.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.state.formData)
       })
@@ -123,7 +148,12 @@ class RunMeasurement extends Component {
         }
       )
       .catch((error) => {
-        console.log(error);
+        if (error.name === 'AbortError') {
+          console.log('Fetch aborted');
+        }
+        else {
+          console.log(error);
+        }
     });
 
     event.preventDefault();
@@ -134,8 +164,8 @@ class RunMeasurement extends Component {
     <LoadingOverlay
       active={this.state.fetchLoading}
       spinner
-      text='Fetching data...'
-      >
+      text = <LoaderText abfetch={this.abortFetching} />
+    >
         <div className="result">
           { this.state.fetchLoading ? null : <ResultDiv item={this.state.firstRunHref} /> }
         </div>

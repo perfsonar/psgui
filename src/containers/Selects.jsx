@@ -73,8 +73,16 @@ class Selects extends Component {
     }), async () => {
       await this.handleDestError();
       await this.handleSourceError();
-      this.props.handleformdatachange('select-source', this.state.sourceOption.value);
-      this.props.handleformdatachange('select-dest', this.state.destOption.value);
+      let initialSOval = '';
+      if(typeof this.state.sourceOption === 'object' && this.state.sourceOption !== null) {
+        initialSOval = this.state.sourceOption.value;
+      }
+      this.props.handleformdatachange('select-source', initialSOval);
+      let initialDOval = '';
+      if(typeof this.state.destOption === 'object' && this.state.destOption !== null) {
+        initialDOval = this.state.destOption.value;
+      }
+      this.props.handleformdatachange('select-dest', initialDOval);
     });
   }
 
@@ -119,7 +127,11 @@ class Selects extends Component {
           }, async () => {
                 await this.handleDestError();
                 await this.handleSourceError();
-                this.props.handleformdatachange('select-source', this.state.sourceOption.value);
+                let initialval = '';
+                if(typeof this.state.sourceOption === 'object' && this.state.sourceOption !== null) {
+                  initialval = this.state.sourceOption.value;
+                }
+                this.props.handleformdatachange('select-source', initialval);
               });
         },
         (error) => {
