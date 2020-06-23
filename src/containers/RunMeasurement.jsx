@@ -113,6 +113,9 @@ class RunMeasurement extends Component {
     this.setState({fetchLoading: true});
     abortController = new AbortController();
     let apiurl = TestDefaultValues.apiurl_run;
+    if (process.env.NODE_ENV !== 'production') {
+      apiurl = TestDefaultValues.devapiurl_run;
+    }
     fetch(apiurl, {
         method: 'POST',
         signal: abortController.signal,

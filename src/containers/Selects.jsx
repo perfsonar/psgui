@@ -104,6 +104,9 @@ class Selects extends Component {
 
   componentDidMount() {
     let apiurl = TestDefaultValues.apiurl_nodes;
+    if (process.env.NODE_ENV !== 'production') {
+      apiurl = TestDefaultValues.devapiurl_nodes;
+    }
     fetch(apiurl)
       .then(res => res.json())
       .then(
