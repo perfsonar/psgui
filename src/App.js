@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import RunMeasurement from './containers/RunMeasurement';
+import GetResults from './containers/GetResults';
 import Links from './Links.js';
 import Page404 from './Page404.js';
 import './App.css';
@@ -18,6 +19,7 @@ class App extends Component {
             <Home />
           </Route>
           <Route path="/runmeasurement" component={RunMeasurement} />
+          <Route path="/getresults/:urlparam" component={GetResults} />
           <Route path="*">
             <Page404 />
           </Route>

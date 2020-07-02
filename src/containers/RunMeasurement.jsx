@@ -5,6 +5,7 @@ import TestParams from '../containers/TestParams';
 import Selects from '../containers/Selects';
 import { Button } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
+import { Redirect } from 'react-router'
 
 let abortController;
 export { abortController };
@@ -12,7 +13,7 @@ export { abortController };
 const ResultDiv = (props) => {
   return (
     <div className='result'>
-      <a href={props.item}>{props.item}</a>
+      {props.item}
     </div>
   );
 }
@@ -20,12 +21,16 @@ const ResultDiv = (props) => {
 class LoaderText extends Component {
   render() {
     return (
-      <Button
-        type="button"
-        onClick={this.props.abfetch}
-        variant="secondary">
-        Cancel
-      </Button>
+      <div>
+        Starting measurement ...
+        <br />
+        <Button
+          type="button"
+          onClick={this.props.abfetch}
+          variant="secondary">
+          Cancel
+        </Button>
+      </div>
     );
   }
 }
@@ -40,7 +45,8 @@ class RunMeasurement extends Component {
       formError: null,
       formErr: [],
       firstRunHref: '',
-      fetchLoading: false
+      fetchLoading: false,
+      resultFetched: false
     };
 
     this.handleFormDataChange = this.handleFormDataChange.bind(this);
@@ -125,7 +131,6 @@ class RunMeasurement extends Component {
       .then(res => {
           if (res.status === 400) {
             res.json().then(async responseJson => {
-              console.log(responseJson);
               if (responseJson.status === 400) {
                 await this.setState({
                   fetchLoading: false,
@@ -144,7 +149,8 @@ class RunMeasurement extends Component {
               async item => {
               await this.setState({
                 fetchLoading: false,
-                firstRunHref: item
+                firstRunHref: item,
+                resultFetched: true
               });
             })
           }
@@ -163,43 +169,52 @@ class RunMeasurement extends Component {
   }
 
   render() {
-    return (
-    <LoadingOverlay
-      active={this.state.fetchLoading}
-      spinner
-      text = <LoaderText abfetch={this.abortFetching} />
-    >
-        <div className="result">
-          { this.state.fetchLoading ? null : <ResultDiv item={this.state.firstRunHref} /> }
-        </div>
-        <div className="RunMeasurement">
-          <form id="runmeasurement" onSubmit={this.handleSubmit}>
-          <div className="Selects">
-            <Selects
-              addformerror = { this.addFormError }
-              removeformerror = { this.removeFormError }
-              handleformdatachange = { this.handleFormDataChange }
-            />
+    if (this.state.resultFetched) {
+        //~ state: {state: this.state},
+      return <Redirect push to={{
+        pathname:'/GetResults/' + encodeURIComponent(this.state.firstRunHref)
+      }}
+      />
+    }
+    else {
+      return (
+      <LoadingOverlay
+        active={this.state.fetchLoading}
+        spinner
+        text = <LoaderText abfetch={this.abortFetching} />
+      >
+          <div className="result">
+            { this.state.fetchLoading ? null : <ResultDiv item={this.state.firstRunHref} /> }
           </div>
-          <div className="TestParams">
-            <TestParams
-              addformerror = { this.addFormError }
-              removeformerror = { this.removeFormError }
-              handleformdatachange = { this.handleFormDataChange }
-            />
+          <div className="RunMeasurement">
+            <form id="runmeasurement" onSubmit={this.handleSubmit}>
+            <div className="Selects">
+              <Selects
+                addformerror = { this.addFormError }
+                removeformerror = { this.removeFormError }
+                handleformdatachange = { this.handleFormDataChange }
+              />
+            </div>
+            <div className="TestParams">
+              <TestParams
+                addformerror = { this.addFormError }
+                removeformerror = { this.removeFormError }
+                handleformdatachange = { this.handleFormDataChange }
+              />
+            </div>
+            <div className="sb">
+              <Button
+                type="submit"
+                disabled={this.state.formError}
+                variant="primary">
+                Submit
+              </Button>
+            </div>
+            </form>
           </div>
-          <div className="sb">
-            <Button
-              type="submit"
-              disabled={this.state.formError}
-              variant="primary">
-              Submit
-            </Button>
-          </div>
-          </form>
-        </div>
-      </LoadingOverlay>
-    );
+        </LoadingOverlay>
+      );
+    }
   }
 }
 export default RunMeasurement;
