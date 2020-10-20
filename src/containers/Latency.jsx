@@ -20,6 +20,14 @@ class Latency extends Component {
     this.setState({showAdvanced: !this.state.showAdvanced});
   }
 
+  componentDidMount() {
+    this.props.handleformdatachange('latency-output-raw', true);
+  }
+
+  componentWillUnmount() {
+    this.props.handleformdatachange('latency-output-raw', null);
+  }
+
   render() {
     return (
       <Fragment>

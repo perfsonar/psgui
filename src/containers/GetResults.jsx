@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../App.css';
 import TestDefaultValues from '../includes/TestDefaultValues.js';
 import Countdown from '../containers/Countdown';
+import DrawResults from '../containers/DrawResults';
 import { Button } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
 import { Redirect } from 'react-router'
@@ -75,13 +76,15 @@ class GetResults extends Component {
       taskhref: '',
       resulthref: '',
       finishedstate: false,
+      failedstate: false,
+      failedreason: '',
       fetchresults: false,
       results: '',
     };
 
     this.cancelAction = this.cancelAction.bind(this);
     this.continueAction = this.continueAction.bind(this);
-    this.doRecursiveFetch = this.doRecursiveFetch.bind(this);
+    this.doFetchFirstRun = this.doFetchFirstRun.bind(this);
   }
 
   abortFetching = async () => {
@@ -99,18 +102,15 @@ class GetResults extends Component {
       fetchresults: true,
     });
 
-    let apiurl = TestDefaultValues.apiurl_firstrunhref;
+    let apiurl = TestDefaultValues.apiurl_resultshref;
     if (process.env.NODE_ENV !== 'production') {
-      apiurl = TestDefaultValues.devapiurl_firstrunhref;
+      apiurl = TestDefaultValues.devapiurl_resultshref;
     }
-    this.doRecursiveFetch(apiurl, 10)
-      .then(data => {
-        //console.log(data);
-      })
+    this.doFetchFirstRun(apiurl, 10)
       .catch(error => console.log(error));
   }
 
-  doRecursiveFetch = (url, limit) =>
+  doFetchFirstRun = (url, limit) =>
     fetch(
       url, {
         method: 'POST',
@@ -122,7 +122,12 @@ class GetResults extends Component {
     .then(res => res.json())
     .then(r => {
       if(r["state"] !== 'finished' && --limit) {
-        setTimeout(this.doRecursiveFetch(url, limit), 2000);
+        this.setState({
+          fetchresults: false,
+          failedstate: true,
+          failedreason: r["state-display"],
+          results: r["result"],
+        });
       }
       else {
         this.setState({
@@ -132,7 +137,7 @@ class GetResults extends Component {
         });
       }
       return r;
-  });
+    });
 
   cancelAction = async () => {
     await this.setState({
@@ -175,6 +180,7 @@ class GetResults extends Component {
           });
         }
         else {
+          this.continueAction();
           this._isMounted && this.setState({
             fetchLoading: false,
           });
@@ -187,36 +193,48 @@ class GetResults extends Component {
   }
 
   render() {
-    let renderresult;
+
     if (this.state.fetchLoading) {
-      renderresult = <LoadingOverlay
-          spinner
-          active={this.state.fetchLoading}
-          text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
-        >
-          <div className="overlay">
-          </div>
-        </LoadingOverlay>;
+      return (
+        <div>
+          <LoadingOverlay
+            spinner
+            active={this.state.fetchLoading}
+            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
+          >
+            <div className="overlay">
+            </div>
+          </LoadingOverlay>
+        </div>
+      );
     }
     else if (this.state.waitingOverlay) {
-      renderresult = <LoadingOverlay
-          spinner
-          active={this.state.waitingOverlay}
-          text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} />
-        >
-          <div className="overlay">
-          </div>
-        </LoadingOverlay>;
+      return (
+        <div>
+          <LoadingOverlay
+            spinner
+            active={this.state.waitingOverlay}
+            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} />
+          >
+            <div className="overlay">
+            </div>
+          </LoadingOverlay>
+        </div>
+      );
     }
     else if (this.state.fetchresults) {
-      renderresult = <LoadingOverlay
-          spinner
-          active={this.state.fetchresults}
-          text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
-        >
-          <div className="overlay">
-          </div>
-        </LoadingOverlay>;
+      return (
+        <div>
+          <LoadingOverlay
+            spinner
+            active={this.state.fetchresults}
+            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
+          >
+            <div className="overlay">
+            </div>
+          </LoadingOverlay>;
+        </div>
+      );
     }
     else if (this.state.actionCanceled) {
       return <Redirect push to={{
@@ -224,18 +242,22 @@ class GetResults extends Component {
       }}
       />
     }
+    else if (this.state.failedstate) {
+      return (
+        <div>Measurement failed: {this.state.failedreason}</div>
+      );
+    }
     else if (this.state.finishedstate) {
-      renderresult = JSON.stringify(this.state.results, null, 2);
+      return (
+        <DrawResults results={this.state.results}/>
+      );
     }
     else {
-      renderresult = '';
+      return (
+        <div>
+        </div>
+      );
     }
-
-    return (
-      <div>
-      {renderresult}
-      </div>
-    );
   }
 }
 export default GetResults;
