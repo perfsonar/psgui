@@ -15,7 +15,7 @@ class DrawResults extends Component {
     if (this.props.results.testtype === 'latency') {
       return (
         <div>
-          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.test.spec.["packet-count"]} packets)</h3>
+          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.test.spec["packet-count"]} packets)</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
           <ReLineChart
             data={this.rawdata}
