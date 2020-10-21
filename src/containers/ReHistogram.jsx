@@ -15,7 +15,7 @@ class ReHistogram extends Component {
   render() {
 		return (
     <BarChart
-      width={800}
+      width={1200}
       height={400}
       data={this.props.data}
       barCategoryGap="1%"
@@ -26,13 +26,13 @@ class ReHistogram extends Component {
       <CartesianGrid strokeDasharray="5" />
       <XAxis
         dataKey="latency"
-        label={{ value: "Latency", position: "insideBottomRight", fill:"#666", dy: 8}}
+        label={{ value: "Latency [ms]", position: "insideBottomRight", fill:"#666", dy: 8}}
       />
       <YAxis
         dataKey="value"
-        label={{ value: "Packets", position: "insideLeft", angle: -90, fill:"#666", dx:5, dy: -100}}
+        label={{ value: "Packets [num]", position: "insideLeft", angle: -90, fill:"#666", dx:5, dy: -70}}
       />
-      <Tooltip />
+      <Tooltip  formatter={(y) => [y, 'Num of packets'] } labelFormatter={(x) => 'Latency : ' + x + 'ms'} />
       <Bar dataKey="value">
         {this.props.data.map((entry, index) => (
           <Cell key={index} fill={colors[index]} />

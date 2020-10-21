@@ -16,9 +16,13 @@ class DrawResults extends Component {
       return (
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.test.spec["packet-count"]} packets)</h3>
+          <div>Average latency: {this.props.results.avglatency} ms</div>
+          <div>Delay variation: {this.props.results.jitter} ms</div>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
           <ReLineChart
             data={this.rawdata}
+            avglatency = {this.props.results.avglatency}
+            jitter = {this.props.results.jitter}
           />
           <ReHistogram
             data={this.histdata}
