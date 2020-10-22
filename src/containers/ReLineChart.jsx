@@ -29,8 +29,8 @@ class ReLineChart extends Component {
         label={{ value: "Latency [ms]", position: "insideLeft", fill:"#666", angle: -90, dx:5, dy: -60}}
       />
       <Line nameKey="a" dataKey="y" strokeWidth={2} dot={false} stroke="CornflowerBlue" />
-      <ReferenceLine y={this.props.avglatency} label={{ position: "left", value: this.props.avglatency + ' ms'}} stroke="red" strokeDasharray="3 3" />
-      <ReferenceArea y1={this.props.avglatency - this.props.jitter} y2={this.props.avglatency + this.props.jitter} strokeOpacity={0.3} />
+      <ReferenceLine y={this.props.stats.p50} label={{ position: "left", value: this.props.stats.p50 + ' ms'}} stroke="red" strokeDasharray="3 3" />
+      <ReferenceArea y1={this.props.stats.p50 - this.props.stats.p95p50} y2={this.props.stats.p50 + this.props.stats.p95p50} strokeOpacity={0.3} />
       <Tooltip formatter={(y) => [y + ' ms', 'Latency'] } labelFormatter={(x) => 'Packet No. ' + x} />
 
     </LineChart>

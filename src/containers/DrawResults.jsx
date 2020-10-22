@@ -16,13 +16,18 @@ class DrawResults extends Component {
       return (
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.test.spec["packet-count"]} packets)</h3>
-          <div>Average latency: {this.props.results.avglatency} ms</div>
-          <div>Delay variation: {this.props.results.jitter} ms</div>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <div>Average latency: {this.props.results.stats.avglatency} ms</div>
+          <div>Delay variation: {this.props.results.stats.rfcjitter} ms</div>
+          <div>Delay Median: {this.props.results.stats.p50} ms</div>
+          <div>Delay Minimum: {this.props.results.stats.minimum} ms</div>
+          <div>Delay Maximum: {this.props.results.stats.maximum} ms</div>
+          <div>Common Jitter Measurements:</div>
+          <div>P95 - P50: {this.props.results.stats.p95p50} ms</div>
+          <div>P75 - P25: {this.props.results.stats.p75p25} ms</div>
           <ReLineChart
             data={this.rawdata}
-            avglatency = {this.props.results.avglatency}
-            jitter = {this.props.results.jitter}
+            stats = {this.props.results.stats}
           />
           <ReHistogram
             data={this.histdata}
