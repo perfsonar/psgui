@@ -2,13 +2,48 @@ import React, { Component } from 'react';
 import '../App.css';
 import ReLineChart from '../containers/ReLineChart';
 import ReHistogram from '../containers/ReHistogram';
+import ReTable from '../containers/ReTable';
+
+const AVGcolumns = [
+  {
+    Header: "Measurement",
+    accessor: "x",
+  },
+  {
+    Header: "Value",
+    accessor: "y",
+  },
+];
+
+const PTcolumns = [
+  {
+    Header: "Packet No.",
+    accessor: "x",
+  },
+  {
+    Header: "Latency",
+    accessor: "y",
+  },
+];
 
 class DrawResults extends Component {
 
   constructor(props) {
     super(props);
-    this.histdata = Object.entries(this.props.results["histogram-latency"]).map(([key, value], i) => ({index:i, latency:key, value:value})).sort((a, b) => a.latency - b.latency)
-    this.rawdata = Object.entries(this.props.results["raw-packets"]).map(([key, value], i) => ({x:key, y:value.calclatency}))
+    if (this.props.results.testtype === 'latency') {
+      this.histdata = Object.entries(this.props.results["histogram-latency"]).map(([key, value], i) => ({index:i, latency:key, value:value})).sort((a, b) => a.latency - b.latency)
+      this.rawdata = Object.entries(this.props.results["raw-packets"]).map(([key, value], i) => ({x:key, y:value.calclatency}))
+    }
+
+    this.avg = [
+        { x : 'Average latency', y :  this.props.results.stats.avglatency + ' ms' },
+        { x : 'Delay variation', y :  this.props.results.stats.rfcjitter + ' ms'},
+        { x : 'Delay Median', y :  this.props.results.stats.p50 + ' ms' },
+        { x : 'Delay Minimum', y :  this.props.results.stats.minimum + ' ms' },
+        { x : 'Delay Maximum', y :  this.props.results.stats.maximum + ' ms' },
+        { x : 'P95 - P50', y :  this.props.results.stats.p95p50 + ' ms' },
+        { x : 'P75 - P25', y :  this.props.results.stats.p75p25 + ' ms' },
+    ];
   }
 
   render() {
@@ -17,14 +52,6 @@ class DrawResults extends Component {
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.test.spec["packet-count"]} packets)</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
-          <div>Average latency: {this.props.results.stats.avglatency} ms</div>
-          <div>Delay variation: {this.props.results.stats.rfcjitter} ms</div>
-          <div>Delay Median: {this.props.results.stats.p50} ms</div>
-          <div>Delay Minimum: {this.props.results.stats.minimum} ms</div>
-          <div>Delay Maximum: {this.props.results.stats.maximum} ms</div>
-          <div>Common Jitter Measurements:</div>
-          <div>P95 - P50: {this.props.results.stats.p95p50} ms</div>
-          <div>P75 - P25: {this.props.results.stats.p75p25} ms</div>
           <ReLineChart
             data={this.rawdata}
             stats = {this.props.results.stats}
@@ -32,6 +59,21 @@ class DrawResults extends Component {
           <ReHistogram
             data={this.histdata}
           />
+          <ReTable
+            columns={AVGcolumns}
+            data={this.avg}
+          />
+          <ReTable
+            columns={PTcolumns}
+            data={this.rawdata}
+          />
+        </div>
+      );
+    }
+    else {
+      return (
+        <div>
+          <a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a>
         </div>
       );
     }
