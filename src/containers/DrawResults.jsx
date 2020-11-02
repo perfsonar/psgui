@@ -35,15 +35,17 @@ class DrawResults extends Component {
       this.rawdata = Object.entries(this.props.results["raw-packets"]).map(([key, value], i) => ({x:key, y:value.calclatency}))
     }
 
-    this.avg = [
-        { x : 'Average latency', y :  this.props.results.stats.avglatency + ' ms' },
-        { x : 'Delay variation', y :  this.props.results.stats.rfcjitter + ' ms'},
-        { x : 'Delay Median', y :  this.props.results.stats.p50 + ' ms' },
-        { x : 'Delay Minimum', y :  this.props.results.stats.minimum + ' ms' },
-        { x : 'Delay Maximum', y :  this.props.results.stats.maximum + ' ms' },
-        { x : 'P95 - P50', y :  this.props.results.stats.p95p50 + ' ms' },
-        { x : 'P75 - P25', y :  this.props.results.stats.p75p25 + ' ms' },
-    ];
+    if (this.props.results.testtype === 'latency') {
+      this.avg = [
+          { x : 'Average latency', y :  this.props.results.stats.avglatency + ' ms' },
+          { x : 'Delay variation', y :  this.props.results.stats.rfcjitter + ' ms'},
+          { x : 'Delay Median', y :  this.props.results.stats.p50 + ' ms' },
+          { x : 'Delay Minimum', y :  this.props.results.stats.minimum + ' ms' },
+          { x : 'Delay Maximum', y :  this.props.results.stats.maximum + ' ms' },
+          { x : 'P95 - P50', y :  this.props.results.stats.p95p50 + ' ms' },
+          { x : 'P75 - P25', y :  this.props.results.stats.p75p25 + ' ms' },
+      ];
+    }
   }
 
   render() {
@@ -71,6 +73,7 @@ class DrawResults extends Component {
       );
     }
     else {
+      console.log(this.props);
       return (
         <div>
           <a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a>
