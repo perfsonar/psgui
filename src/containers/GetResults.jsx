@@ -123,7 +123,7 @@ class GetResults extends Component {
     .then(r => {
       if(r["state"] !== 'finished' && --limit) {
         let fr = r["state-display"]
-        if(r["state-display"] == 'Pending' || r["state-display"] == 'Pending' || r["state-display"] == 'Pending' || r["state-display"] == 'Pending') {
+        if(r["state-display"] == 'Pending' || r["state-display"] == 'Running' || r["state-display"] == 'Cleanup' || r["state-display"] == 'On Deck') {
           fr = fr + ' - ' + 'Please try to refresh this page in couple of seconds'
         }
         this.setState({
