@@ -122,10 +122,14 @@ class GetResults extends Component {
     .then(res => res.json())
     .then(r => {
       if(r["state"] !== 'finished' && --limit) {
+        let fr = r["state-display"]
+        if(r["state-display"] == 'Pending' || r["state-display"] == 'Pending' || r["state-display"] == 'Pending' || r["state-display"] == 'Pending') {
+          fr = fr + ' - ' + 'Please try to refresh this page in couple of seconds'
+        }
         this.setState({
           fetchresults: false,
           failedstate: true,
-          failedreason: r["state-display"],
+          failedreason: fr,
           results: r["result"],
         });
       }
@@ -171,7 +175,7 @@ class GetResults extends Component {
         });
         let curtime = new Date().getTime();
         let endtime = new Date(r["end-time"]).getTime();
-        let timediff = 5 + (endtime - curtime) / 1000;
+        let timediff = 15 + (endtime - curtime) / 1000;
         if(timediff > 0) {
           this._isMounted && this.setState({
             fetchLoading: false,
@@ -244,7 +248,7 @@ class GetResults extends Component {
     }
     else if (this.state.failedstate) {
       return (
-        <div>Measurement failed: {this.state.failedreason}</div>
+        <div>Measurement status: {this.state.failedreason}</div>
       );
     }
     else if (this.state.finishedstate) {

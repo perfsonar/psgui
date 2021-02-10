@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { LineChart, Line, ReferenceLine, ReferenceArea, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 
-class ReLineChart extends Component {
+class ReLatencyChart extends Component {
 
   render() {
+    console.log(this.props.data);
 		return (
     <LineChart
       width={1200}
@@ -38,4 +39,4 @@ class ReLineChart extends Component {
 	}
 }
 
-export default ReLineChart;
+export default ReLatencyChart;

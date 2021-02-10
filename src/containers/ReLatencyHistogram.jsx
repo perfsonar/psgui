@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import colors from '../includes/colordata.js';
 
-class ReHistogram extends Component {
+class ReLatencyHistogram extends Component {
 
   render() {
 		return (
@@ -43,4 +43,4 @@ class ReHistogram extends Component {
 	}
 }
 
-export default ReHistogram;
+export default ReLatencyHistogram;
