@@ -174,7 +174,13 @@ class GetResults extends Component {
           resulthref: r["result-href"]
         });
         let curtime = new Date().getTime();
-        let endtime = new Date(r["end-time"]).getTime();
+        let servendtime = r["end-time"];
+
+        var re = new RegExp(/([+\-]\d\d)$/);
+        if(re.test(servendtime)) {
+          servendtime = servendtime + ':00';
+        }
+        let endtime = new Date(servendtime).getTime();
         let timediff = 15 + (endtime - curtime) / 1000;
         if(timediff > 0) {
           this._isMounted && this.setState({

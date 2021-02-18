@@ -4,7 +4,6 @@ import { LineChart, Line, ReferenceLine, ReferenceArea, CartesianGrid, XAxis, YA
 class ReLatencyChart extends Component {
 
   render() {
-    console.log(this.props.data);
 		return (
     <LineChart
       width={1200}

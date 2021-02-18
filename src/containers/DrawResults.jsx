@@ -28,6 +28,17 @@ const PTcolumns = [
   },
 ];
 
+const TPcolumns = [
+  {
+    Header: "Second",
+    accessor: "x",
+  },
+  {
+    Header: "Throughput",
+    accessor: "y",
+  },
+];
+
 class DrawResults extends Component {
 
   constructor(props) {
@@ -46,7 +57,6 @@ class DrawResults extends Component {
       this.divisionSep = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
       this.measurementUnits = getReadableNetworkSpeedString(this.divisionSep)
       this.rawdata = Object.entries(this.props.results.intervals).map((value) => ({x:Math.round(value["1"].streams["0"].end), y:(value["1"].streams["0"]["throughput-bits"]/this.divisionSep).toFixed(2)}))
-      console.log(getReadableNetworkSpeedString(1000000))
     }
 
     if (this.props.results.testtype === 'latency') {
@@ -66,7 +76,7 @@ class DrawResults extends Component {
     if (this.props.results.testtype === 'latency') {
       return (
         <div>
-          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.test.spec["packet-count"]} packets)</h3>
+          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results["packets-sent"]} packets)</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
           <ReLatencyChart
             data={this.rawdata}
@@ -89,10 +99,15 @@ class DrawResults extends Component {
     else if (this.props.results.testtype === 'throughput') {
       return (
         <div>
-          <a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a>
+          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
+          <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
           <ReThroughputChart
             data={this.rawdata}
             units={this.measurementUnits}
+          />
+          <ReTable
+            columns={TPcolumns}
+            data={this.rawdata}
           />
         </div>
       );
