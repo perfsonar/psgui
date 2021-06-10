@@ -123,8 +123,8 @@ class GetResults extends Component {
     .then(r => {
       if(r["state"] !== 'finished' && --limit) {
         let fr = r["state-display"]
-        if(r["state-display"] == 'Pending' || r["state-display"] == 'Running' || r["state-display"] == 'Cleanup' || r["state-display"] == 'On Deck') {
-          fr = fr + ' - ' + 'Please try to refresh this page in couple of seconds'
+        if(r["state-display"] === 'Pending' || r["state-display"] === 'Running' || r["state-display"] === 'Cleanup' || r["state-display"] === 'On Deck') {
+          fr = fr + ' - Please try to refresh this page in couple of seconds'
         }
         this.setState({
           fetchresults: false,
@@ -181,7 +181,7 @@ class GetResults extends Component {
           servendtime = servendtime + ':00';
         }
         let endtime = new Date(servendtime).getTime();
-        let timediff = 15 + (endtime - curtime) / 1000;
+        let timediff = 20 + (endtime - curtime) / 1000;
         if(timediff > 0) {
           this._isMounted && this.setState({
             fetchLoading: false,
@@ -254,7 +254,7 @@ class GetResults extends Component {
     }
     else if (this.state.failedstate) {
       return (
-        <div>Measurement status: {this.state.failedreason}</div>
+        <div>Measurement status: {this.state.failedreason} <a href={this.state.firstRunHref}>{this.state.firstRunHref}</a></div>
       );
     }
     else if (this.state.finishedstate) {

@@ -39,6 +39,68 @@ const TPcolumns = [
   },
 ];
 
+const RTcolumns = [
+  {
+    Header: "Nr.",
+    accessor: "x",
+  },
+  {
+    Header: "IP",
+    accessor: "y",
+  },
+  {
+    Header: "Length (Bytes)",
+    accessor: "z",
+  },
+  {
+    Header: "TTL",
+    accessor: "p",
+  },
+  {
+    Header: "Time",
+    accessor: "q",
+  },
+];
+
+const TTcolumns = [
+  {
+    Header: "Nr.",
+    accessor: "x",
+  },
+  {
+    Header: "hostname",
+    accessor: "y",
+  },
+  {
+    Header: "IP",
+    accessor: "z",
+  },
+  {
+    Header: "RTT",
+    accessor: "p",
+  },
+  //~ {
+    //~ Header: "AS Owner",
+    //~ accessor: "q",
+  //~ },
+  //~ {
+    //~ Header: "AS Number",
+    //~ accessor: "r",
+  //~ },
+];
+
+const flatten = (obj, prefix = '', res = {}) =>
+  Object.entries(obj).reduce((r, [key, val]) => {
+    const k = `${prefix}${key}`
+    if(typeof val === 'object'){
+      flatten(val, `${k}.`, r)
+    } else {
+      res[k] = val
+    }
+    return r
+  }, res
+)
+
 class DrawResults extends Component {
 
   constructor(props) {
@@ -57,6 +119,24 @@ class DrawResults extends Component {
       this.divisionSep = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
       this.measurementUnits = getReadableNetworkSpeedString(this.divisionSep)
       this.rawdata = Object.entries(this.props.results.intervals).map((value) => ({x:Math.round(value["1"].streams["0"].end), y:(value["1"].streams["0"]["throughput-bits"]/this.divisionSep).toFixed(2)}))
+    }
+    else if (this.props.results.testtype === 'rtt') {
+      this.rawdata = Object.entries(this.props.results["result"]["roundtrips"]).map(([key, value], i) => ({x:key, y:value['ip'], z:value['length'], p:value['ttl']}))
+    }
+    else if (this.props.results.testtype === 'trace') {
+      //~ console.log(flatten(this.props.results["result"]["paths"][0]))
+      this.rawdata = Object.entries(
+        this.props.results["result"]["paths"][0]).map(
+          ([key, value], i) => ({
+            x:key,
+            y:value['hostname'],
+            z:value['ip'],
+            p:value['rtt'],
+            q:value["as"],
+            r:value['as']
+          })
+      )
+      //~ console.log(this.rawdata);
     }
 
     if (this.props.results.testtype === 'latency') {
@@ -107,6 +187,30 @@ class DrawResults extends Component {
           />
           <ReTable
             columns={TPcolumns}
+            data={this.rawdata}
+          />
+        </div>
+      );
+    }
+    else if (this.props.results.testtype === 'rtt') {
+      return (
+        <div>
+          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
+          <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <ReTable
+            columns={RTcolumns}
+            data={this.rawdata}
+          />
+        </div>
+      );
+    }
+    else if (this.props.results.testtype === 'trace') {
+      return (
+        <div>
+          <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
+          <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <ReTable
+            columns={TTcolumns}
             data={this.rawdata}
           />
         </div>

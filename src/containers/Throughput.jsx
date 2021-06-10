@@ -39,14 +39,16 @@ class Throughput extends Component {
   };
 
   handleTestDurationChange = async event => {
-    const {name, value} = event.target
+    const {value} = event.target
     let valuesubmit = 'PT' + parseInt(value) + 'S'
+
     await this.setState({
       valueTestDuration: value,
       valueTestDurationSubmit: valuesubmit
     });
+
     this.validateTDu();
-    this.props.handleformdatachange(name, valuesubmit);
+    this.props.handleformdatachange('throughput-test-duration-submit', valuesubmit);
   }
 
     validateTDu = () => {
@@ -73,7 +75,7 @@ class Throughput extends Component {
 
   componentDidMount() {
     this.props.handleformdatachange('select-throughput-protocol', this.state.valueProtocol[0].value);
-    this.props.handleformdatachange('throughput-test-duration', this.state.valueTestDuration);
+    this.props.handleformdatachange('throughput-test-duration-submit', this.state.valueTestDurationSubmit);
   }
 
   componentWillUnmount() {
