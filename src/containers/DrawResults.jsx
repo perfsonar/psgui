@@ -57,7 +57,7 @@ const RTcolumns = [
     accessor: "p",
   },
   {
-    Header: "Time",
+    Header: "Time (ms)",
     accessor: "q",
   },
 ];
@@ -76,7 +76,7 @@ const TTcolumns = [
     accessor: "z",
   },
   {
-    Header: "RTT",
+    Header: "RTT (ms)",
     accessor: "p",
   },
   //~ {
@@ -101,6 +101,9 @@ const flatten = (obj, prefix = '', res = {}) =>
   }, res
 )
 
+//~ const iso8601sec2ms = (iso) => 1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S"))).toFixed(2);
+const iso8601sec2ms = (iso) => (iso) ? (1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S")))).toFixed(2) : '';
+
 class DrawResults extends Component {
 
   constructor(props) {
@@ -121,22 +124,28 @@ class DrawResults extends Component {
       this.rawdata = Object.entries(this.props.results.intervals).map((value) => ({x:Math.round(value["1"].streams["0"].end), y:(value["1"].streams["0"]["throughput-bits"]/this.divisionSep).toFixed(2)}))
     }
     else if (this.props.results.testtype === 'rtt') {
-      this.rawdata = Object.entries(this.props.results["result"]["roundtrips"]).map(([key, value], i) => ({x:key, y:value['ip'], z:value['length'], p:value['ttl']}))
+      this.rawdata = Object.entries(this.props.results["result"]["roundtrips"]).map(
+        ([key, value], i) => ({
+          x:key,
+          y:value['ip'],
+          z:value['length'],
+          p:value['ttl'],
+          q:iso8601sec2ms(value['rtt'])
+        })
+      )
     }
     else if (this.props.results.testtype === 'trace') {
-      //~ console.log(flatten(this.props.results["result"]["paths"][0]))
       this.rawdata = Object.entries(
         this.props.results["result"]["paths"][0]).map(
           ([key, value], i) => ({
             x:key,
             y:value['hostname'],
             z:value['ip'],
-            p:value['rtt'],
             q:value["as"],
-            r:value['as']
+            r:value['as'],
+            p:iso8601sec2ms(value['rtt'])
           })
       )
-      //~ console.log(this.rawdata);
     }
 
     if (this.props.results.testtype === 'latency') {
