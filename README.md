@@ -1,8 +1,8 @@
-#perfSONAR pScheduler GUI for on-demand measurement
+# perfSONAR pScheduler GUI for on-demand measurement
 
 psGUI in combination with psproxy allows users to start on-demand measurement between two nodes from the MaDDash grid.
 
-##Configuration
+## Configuration
 
 Clone repository and edit src/includes/TestDefaultValues.js to configure URLs. Build the app with:
 ```
