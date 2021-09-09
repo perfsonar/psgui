@@ -1,10 +1,21 @@
-### `yarn start`
+#perfSONAR pScheduler GUI for on-demand measurement
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+psGUI in combination with psproxy allows users to start on-demand measurement between two nodes from the MaDDash grid.
 
-### `yarn build`
+##Configuration
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Clone repository and edit src/includes/TestDefaultValues.js to configure URLs. Build the app with:
+```
+yarn build
+```
+This builds the app for production to the `build` folder. Make that folder root of the web server. Also, this version does not support users so it is a good idea to protect access to it using web server authentication.
 
+nginx example:
+```
+server {
+        listen 80 default_server;
+        root /var/www/psgui/build;
+        auth_basic "Please enter username and password";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+}
+```
