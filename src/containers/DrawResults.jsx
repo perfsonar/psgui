@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import '../App.css';
 import ReLatencyChart from '../containers/ReLatencyChart';
 import ReThroughputChart from '../containers/ReThroughputChart';
+import ReRTTChart from '../containers/ReRTTChart';
+import ReTraceChart from '../containers/ReTraceChart';
 import ReLatencyHistogram from '../containers/ReLatencyHistogram';
 import ReTable from '../containers/ReTable';
 import { getReadableNetworkSpeedString, getThousendsDivisionSep } from '../includes/common.js';
@@ -102,7 +104,7 @@ const flatten = (obj, prefix = '', res = {}) =>
 )
 
 //~ const iso8601sec2ms = (iso) => 1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S"))).toFixed(2);
-const iso8601sec2ms = (iso) => (iso) ? (1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S")))).toFixed(2) : '';
+const iso8601sec2ms = (iso) => (iso) ? parseFloat((1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S")))).toFixed(2)) : 0;
 
 class DrawResults extends Component {
 
@@ -146,6 +148,13 @@ class DrawResults extends Component {
             p:iso8601sec2ms(value['rtt'])
           })
       )
+      let val = 0
+      for (var k in this.rawdata){
+        if(k > 0 && this.rawdata[k]['p'] == 0) {
+          this.rawdata[k]['p'] = val
+        }
+        val = this.rawdata[k]['p']
+      }
     }
 
     if (this.props.results.testtype === 'latency') {
@@ -206,6 +215,10 @@ class DrawResults extends Component {
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <ReRTTChart
+            data={this.rawdata}
+            units={this.measurementUnits}
+          />
           <ReTable
             columns={RTcolumns}
             data={this.rawdata}
@@ -218,6 +231,10 @@ class DrawResults extends Component {
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <ReTraceChart
+            data={this.rawdata}
+            units={this.measurementUnits}
+          />
           <ReTable
             columns={TTcolumns}
             data={this.rawdata}
