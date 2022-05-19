@@ -10,6 +10,9 @@ import { Redirect } from 'react-router'
 let abortController;
 export { abortController };
 
+//~ https://github.com/derrickpelletier/react-loading-overlay/pull/57#issuecomment-1054194254
+LoadingOverlay.propTypes = undefined;
+
 class LoaderText extends Component {
   render() {
     if(this.props.waittime) {

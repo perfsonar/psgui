@@ -8,8 +8,6 @@ import Rtt from '../containers/Rtt';
 import Trace from '../containers/Trace';
 import {RadioGroup, Radio} from 'react-radio-group'
 
-const options = TestDefaultValues.tests.map(item => ({ label: item,  value: item}));
-
 class TestParams extends Component {
 
   constructor(props) {
@@ -20,18 +18,34 @@ class TestParams extends Component {
     let test = params.get('test');
 
     this.state = {
-      testoptions: options,
-      testOption: options.filter(option => option.value === test)[0],
+      //~ testoptions: this.props.options,
+      testoptions: this.props.defoptions,
+      testOption: this.props.options.filter(option => option.value === test)[0],
       ipVersion: TestDefaultValues.defaultparams.general.default_ipversion
     };
 
     this.handleTestChange = this.handleTestChange.bind(this);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.options !== prevProps.options) {
+      this.setState({
+        testoptions: this.props.defoptions.filter(f => this.props.options.includes(f.value)),
+      });
+    }
+    if (this.props.options.length > 0) {
+      this.props.removeformerror('tests-declared')
+    }
+    else {
+      this.props.addformerror('tests-declared')
+    }
+  }
+
   componentDidMount() {
+
     if(!this.state.testOption || this.state.testOption==='') {
       this.setState({
-        testOption: options.filter(option => option.value === TestDefaultValues.defaultparams.general.default_test)[0]
+        testOption: this.props.options.filter(option => option.value === TestDefaultValues.defaultparams.general.default_test)[0]
       });
       this.props.handleformdatachange('select-test', TestDefaultValues.defaultparams.general.default_test);
     }
@@ -55,42 +69,40 @@ class TestParams extends Component {
   };
 
   renderSelectedTest(param) {
-    switch(param.value) {
-      case 'throughput':
-        return <Throughput
-          addformerror = { this.props.addformerror }
-          removeformerror = { this.props.removeformerror }
-          handleformdatachange = { this.props.handleformdatachange }
-        />;
-      case 'latency':
-        return <Latency
-          addformerror = { this.props.addformerror }
-          removeformerror = { this.props.removeformerror }
-          handleformdatachange = { this.props.handleformdatachange }
-        />;
-      case 'rtt':
-        return <Rtt
-          addformerror = { this.props.addformerror }
-          removeformerror = { this.props.removeformerror }
-          handleformdatachange = { this.props.handleformdatachange }
-        />;
-      case 'trace':
-        return <Trace
-          addformerror = { this.props.addformerror }
-          removeformerror = { this.props.removeformerror }
-          handleformdatachange = { this.props.handleformdatachange }
-        />;
-      default:
-        return '';
+    if (typeof param !== 'undefined') {
+      switch(param.value) {
+        case null:
+        case 'throughput':
+          return <Throughput
+            addformerror = { this.props.addformerror }
+            removeformerror = { this.props.removeformerror }
+            handleformdatachange = { this.props.handleformdatachange }
+          />;
+        case 'latency':
+          return <Latency
+            addformerror = { this.props.addformerror }
+            removeformerror = { this.props.removeformerror }
+            handleformdatachange = { this.props.handleformdatachange }
+          />;
+        case 'rtt':
+          return <Rtt
+            addformerror = { this.props.addformerror }
+            removeformerror = { this.props.removeformerror }
+            handleformdatachange = { this.props.handleformdatachange }
+          />;
+        case 'trace':
+          return <Trace
+            addformerror = { this.props.addformerror }
+            removeformerror = { this.props.removeformerror }
+            handleformdatachange = { this.props.handleformdatachange }
+          />;
+        default:
+          return '';
+      }
     }
   }
 
   render() {
-    const { testoptions, testOption } = this.state;
-    if(!this.state.testOption || this.state.testOption==='') {
-      return <div>Error - wrong URL param test</div>;
-    }
-    else {
       return (
         <fieldset>
           <legend>Test parameters</legend>
@@ -101,9 +113,9 @@ class TestParams extends Component {
                   <Select
                     placeholder="Select test"
                     name={"select-test"}
-                    options= { testoptions }
+                    options= {  this.state.testoptions }
                     onChange={this.handleTestChange}
-                    value={ testOption } />
+                    value={  this.state.testOption } />
                 </div>
               </div>
               <div className="row">
@@ -114,11 +126,10 @@ class TestParams extends Component {
                   </RadioGroup>
                 </div>
               </div>
-              {this.renderSelectedTest(testOption)}
+              {this.renderSelectedTest(this.state.testOption)}
             </div>
         </fieldset>
       );
-    }
   }
 }
 

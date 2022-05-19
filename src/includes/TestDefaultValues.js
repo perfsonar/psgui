@@ -3,10 +3,12 @@ const TestDefaultValues = {
   apiurl_run: 'http://psgui.qalab.geant.org/api/runm',
   apiurl_firstrunhref: 'http://psgui.qalab.geant.org/api/getfirstrun',
   apiurl_resultshref: 'http://psgui.qalab.geant.org/api/getresults',
+  apiurl_testshref: 'http://psgui.qalab.geant.org/api/gettests',
   devapiurl_nodes: 'http://127.0.0.1:5000/api/nodes',
   devapiurl_run: 'http://127.0.0.1:5000/api/runm',
   devapiurl_firstrunhref: 'http://127.0.0.1:5000/api/getfirstrun',
   devapiurl_resultshref: 'http://127.0.0.1:5000/api/getresults',
+  devapiurl_testshref: 'http://127.0.0.1:5000/api/gettests',
   geant_nodes:{
     rows:[
       {"label":"GÉANT- Lisbon BW IPv4 - psmp-gn-bw-01-lis-pt-v4.geant.net", "value":"psmp-gn-bw-01-lis-pt-v4.geant.net"},
