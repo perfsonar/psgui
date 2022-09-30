@@ -7,9 +7,9 @@
     "@testing-library/react": "^10.4.9",
     "@testing-library/user-event": "^10.4.1",
     "bootstrap": "^4.5.3",
-    "d3": "^6.2.0",
+    "d3": "^7.6.1",
     "d3-axis": "^2.0.0",
-    "d3-scale": "^3.2.3",
+    "d3-scale": "^4.0.2",
     "d3-selection": "^2.0.0",
     "d3-shape": "^2.0.0",
     "query-string": "^6.13.6",
@@ -23,7 +23,7 @@
     "react-select": "^3.1.0",
     "react-switch": "^5.0.1",
     "react-table": "^7.6.0",
-    "recharts": "^1.8.5",
+    "recharts": "^2.1.14",
     "styled-components": "^5.2.0"
   },
   "scripts": {
