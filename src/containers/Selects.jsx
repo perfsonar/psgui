@@ -112,7 +112,7 @@ class Selects extends Component {
       .then(
         (items) => {
           let options = items.rows.map(item => ({ label: item.name,  value: item.id}));
-          Object.assign(options, TestDefaultValues.geant_nodes.rows);
+          Array.prototype.push.apply(options, TestDefaultValues.geant_nodes.rows);
           options.sort(function(a, b) {
             var labelA = a.label.toUpperCase();
             var labelB = b.label.toUpperCase();
