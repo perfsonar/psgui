@@ -4,7 +4,6 @@
   text-align: left;
 }
 
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -20,6 +19,54 @@
   color: #61dafb;
 }
 
+#page {
+  text-align: center;
+}
+
+#page .title {
+  margin: 20px;
+}
+
+#header {
+  position: relative;
+  height: 60px;
+}
+
+#logo1 {
+  margin-top: 7px;
+}
+
+#logo2 {
+  float:right;
+}
+
+.bord {
+  width: 80%;
+  display: inline-block;
+  margin: 10px auto;
+  padding-top: 15px;
+  border-radius: 25px;
+}
+
+.b1 {
+  background-color: linen;
+}
+
+.b2 {
+  background-color: mintcream;
+}
+
+.b3 {
+  background-color: azure;
+}
+
+.b4 {
+  background-color: oldlace;
+}
+
+.b5 {
+  background-color: whitesmoke;
+}
 
 nav ul {
   list-style-type: none;
