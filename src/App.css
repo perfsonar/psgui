@@ -147,3 +147,9 @@ input, label {
     background: rgba(51,51,51,0.7);
     z-index: 10;
 }
+
+.testparams {
+  width: 30%;
+  margin: 5px;
+  background-color: cornsilk;
+}

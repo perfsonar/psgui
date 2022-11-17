@@ -106,6 +106,25 @@ const flatten = (obj, prefix = '', res = {}) =>
 //~ const iso8601sec2ms = (iso) => 1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S"))).toFixed(2);
 const iso8601sec2ms = (iso) => (iso) ? parseFloat((1000*parseFloat(iso.substring(iso.lastIndexOf("PT") + 2, iso.lastIndexOf("S")))).toFixed(2)) : 0;
 
+const TestParameters = (tp) => {
+  const [showParams, setShowParams] = React.useState(false)
+  console.log(showParams);
+  const onClick = () => setShowParams(!showParams);
+  console.log(showParams);
+  return (
+    <div>
+      <input type="submit" value="Show/Hide Test Parameters" onClick={onClick} />
+      { showParams ? <TestParams tp={tp} /> : null }
+    </div>
+  )
+}
+
+const TestParams = (tp) => (
+    <div className="testparams">
+        <pre className="description">{JSON.stringify(tp, null, 2) }</pre>
+    </div>
+)
+
 class DrawResults extends Component {
 
   constructor(props) {
@@ -176,6 +195,9 @@ class DrawResults extends Component {
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results["packets-sent"]} packets)</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <TestParameters
+            tp={this.props.results.tr.test.spec}
+          />
           <ReLatencyChart
             data={this.rawdata}
             stats = {this.props.results.stats}
@@ -199,6 +221,9 @@ class DrawResults extends Component {
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <TestParameters
+            tp={this.props.results.tr.test.spec}
+          />
           <ReThroughputChart
             data={this.rawdata}
             units={this.measurementUnits}
@@ -215,6 +240,9 @@ class DrawResults extends Component {
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <TestParameters
+            tp={this.props.results.tr.test.spec}
+          />
           <ReRTTChart
             data={this.rawdata}
             units={this.measurementUnits}
@@ -227,10 +255,14 @@ class DrawResults extends Component {
       );
     }
     else if (this.props.results.testtype === 'trace') {
+        console.log(this.props.results.tr.test.spec);
       return (
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>
           <div><a href={this.props.results.tr.href + '/runs/first'}>{this.props.results.tr.href}/runs/first</a></div>
+          <TestParameters
+            tp={this.props.results.tr.test.spec}
+          />
           <ReTraceChart
             data={this.rawdata}
             units={this.measurementUnits}
