@@ -142,7 +142,7 @@ class DrawResults extends Component {
       sepArr.forEach(function(x) { counts[x] = (counts[x] || 0)+1; });
       this.divisionSep = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
       this.measurementUnits = getReadableNetworkSpeedString(this.divisionSep)
-      this.rawdata = Object.entries(this.props.results.intervals).map((value) => ({x:Math.round(value["1"].streams["0"].end), y:(value["1"].streams["0"]["throughput-bits"]/this.divisionSep).toFixed(2)}))
+      this.rawdata = Object.entries(this.props.results.intervals).filter(value => value["1"].streams["0"].omitted==false).map((value) => ({x:Math.round(value["1"].streams["0"].end), y:(value["1"].streams["0"]["throughput-bits"]/this.divisionSep).toFixed(2)}))
     }
     else if (this.props.results.testtype === 'rtt') {
       this.rawdata = Object.entries(this.props.results["result"]["roundtrips"]).map(
