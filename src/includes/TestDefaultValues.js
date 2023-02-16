@@ -1,7 +1,7 @@
 const TestDefaultValues = {
   maddash_url: 'https://pmp-central.geant.org/maddash-webui/',
-  apiurl_nodes: 'http://psgui.qalab.geant.org/api/nodes',
-  apiurl_run: 'http://psgui.qalab.geant.org/api/runm',
+  apiurl_nodes: 'https://psgui.qalab.geant.org/api/nodes',
+  apiurl_run: 'https://psgui.qalab.geant.org/api/runm',
   apiurl_firstrunhref: 'http://psgui.qalab.geant.org/api/getfirstrun',
   apiurl_resultshref: 'http://psgui.qalab.geant.org/api/getresults',
   apiurl_testshref: 'http://psgui.qalab.geant.org/api/gettests',
