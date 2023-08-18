@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  psproxy:
+    build: psproxy
+    command: ["flask", "run", "--host=0.0.0.0"]
+    stdin_open: true
+    volumes:
+      - ./psproxy/custom_config.py:/psproxy/config.py
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    ports:
+      - "5000:5000"
+
+  psgui:
+    environment:
+      NODE_ENV: development
+    build: psgui
+    volumes:
+      - ./psgui/custom_TestDefaultValues.js:/psgui/src/includes/TestDefaultValues.js
+    stdin_open: true
+    command: yarn start
+    ports:
+      - 3000:3000
