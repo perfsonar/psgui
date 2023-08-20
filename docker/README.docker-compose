@@ -1,0 +1,35 @@
+HOW TO RUN
+
+This docker-compose is intended for testing purposes or for running the app from
+your local pc. This install creates docker images for psgui frontend and psproxy
+backend. For running this app in production follow README.md from the front
+page of the psgui and psproxy repos.
+
+Clone latest psgui from github:
+
+git clone https://github.com/perfsonar/psgui.git
+
+Enter docker subdirectory. There are two config files in two subdirectories.
+You can leave everything as it is if you want to try it with GÉANT PMP nodes.
+
+In subdirectory psproxy there is custom_config.py. You can change url in psproxy
+config file to get nodes from your maddash. This is all you have to do if you
+simply want to try the app with your maddash instance.
+
+In subdirectory psgui there is custom_TestDefaultValues.js. You can change URLs
+for production there or add custom perfsonar hosts out of your maddash instance.
+It is a json file, just check geant_nodes key - add more hosts with label and
+value keypairs.
+
+Make sure you have docker-compose installed and run
+
+docker-compose up --build -d
+
+from docker subdirectory.
+
+After the build is finished you are supposed to have two working docker containers.
+Access localhost:3000 and you'll have working app.
+
+Stop everything with:
+
+docker-compose down
