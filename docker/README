@@ -1,0 +1,5 @@
+Use provided directories for designated purpose.
+
+build_single_image - create your own custom image
+local_development - if you want to change the code use this for local development
+simple_install - use already built image to get things running quickly

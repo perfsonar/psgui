@@ -1,0 +1,15 @@
+HOW TO RUN
+
+docker build -t psgui .
+docker run -d -p 443:443 psgui
+
+List of files:
+custom_config.py - Backend config to customize PSCONFIG location of your mash
+custom_TestDefaultValues.js - Frontend config to customize URL location of your mash
+Dockerfile
+entrypoint.sh - script for executing yarn build to include custom_TestDefaultValues.js
+.htpasswd - default user:pass are psgui:psgui
+nginx.conf - custom nginx config
+nginx.crt - nginx self-signed certificate
+nginx.key - nginx self-signed certificate key
+supervisord.conf - supervisor config to run stuff inside container

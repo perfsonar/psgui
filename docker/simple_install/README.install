@@ -1,0 +1,19 @@
+Simple install pulls latest prepared image and mounts custom files.
+Customize stuff by changing provided files.
+
+HOW TO RUN
+
+docker-compose up --build -d
+docker-compose down
+
+List of files:
+custom_config.py - Backend config to customize PSCONFIG location of your mash
+custom_TestDefaultValues.js - Frontend config to customize URL location of your mash
+docker-compose.yml
+Dockerfile
+.htpasswd - default user:pass are psgui:psgui
+nginx.conf - custom nginx config
+nginx.crt - nginx self-signed certificate
+nginx.key - nginx self-signed certificate key
+
+
