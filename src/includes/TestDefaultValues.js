@@ -12,20 +12,16 @@ const TestDefaultValues = {
   devapiurl_testshref: 'http://127.0.0.1:5000/api/gettests',
   geant_nodes:{
     rows:[
-      {"label":"GÉANT- Lisbon BW IPv4 - psmp-gn-bw-01-lis-pt-v4.geant.net", "value":"psmp-gn-bw-01-lis-pt-v4.geant.net"},
-      {"label":"GÉANT- Lisbon BW IPv6 - psmp-gn-bw-01-lis-pt-v6.geant.net", "value":"psmp-gn-bw-01-lis-pt-v6.geant.net"},
-      {"label":"GÉANT- Poznan BW IPv4 - psmp-gn-bw-01-poz-pl-v4.geant.net", "value":"psmp-gn-bw-01-poz-pl-v4.geant.net"},
-      {"label":"GÉANT- Poznan BW IPv6 - psmp-gn-bw-01-poz-pl-v6.geant.net", "value":"psmp-gn-bw-01-poz-pl-v6.geant.net"},
-      {"label":"GÉANT- Geneva BW - psmp-gn-bw-gen-ch.geant.org", "value":"psmp-gn-bw-gen-ch.geant.org"},
-      {"label":"GÉANT- London BW - psmp-gn-bw-lon-uk.geant.org", "value":"psmp-gn-bw-lon-uk.geant.org"},
-      {"label":"GÉANT- Sofia BW - psmp-gn-bw-sof-bg.geant.org", "value":"psmp-gn-bw-sof-bg.geant.org"},
-      {"label":"GÉANT- Lisbon OWD IPv4 - psmp-gn-owd-01-lis-pt-v4.geant.net", "value":"psmp-gn-owd-01-lis-pt-v4.geant.net"},
-      {"label":"GÉANT- Lisbon OWD IPv6 - psmp-gn-owd-01-lis-pt-v6.geant.net", "value":"psmp-gn-owd-01-lis-pt-v6.geant.net"},
-      {"label":"GÉANT- Poznan OWD IPv4 - psmp-gn-owd-01-poz-pl-v4.geant.net", "value":"psmp-gn-owd-01-poz-pl-v4.geant.net"},
-      {"label":"GÉANT- Poznan OWD IPv6 - psmp-gn-owd-01-poz-pl-v6.geant.net", "value":"psmp-gn-owd-01-poz-pl-v6.geant.net"},
-      {"label":"GÉANT- Geneva OWD - psmp-gn-owd-gen-ch.geant.org", "value":"psmp-gn-owd-gen-ch.geant.org"},
-      {"label":"GÉANT- London OWD - psmp-gn-owd-lon-uk.geant.org", "value":"psmp-gn-owd-lon-uk.geant.org"},
-      {"label":"GÉANT- Sofia OWD - psmp-gn-owd-sof-bg.geant.org", "value":"psmp-gn-owd-sof-bg.geant.org"}
+      {"label":"GN - Lisbon BW - psmp-gn-bw-lis-pt.geant.org", "value":"psmp-gn-bw-lis-pt.geant.org"},
+      {"label":"GN - Lisbon OWD - psmp-gn-owd-lis-pt.geant.org", "value":"psmp-gn-owd-lis-pt.geant.org"},
+      {"label":"GN - Poznan BW - psmp-gn-bw-poz-pl.geant.org", "value":"psmp-gn-bw-poz-pl.geant.org"},
+      {"label":"GN - Poznan OWD - psmp-gn-owd-poz-pl.geant.org", "value":"psmp-gn-owd-poz-pl.geant.org"},
+      {"label":"GN - London BW - psmp-gn-bw-lon2-uk.geant.org", "value":"psmp-gn-bw-lon2-uk.geant.org"},
+      {"label":"GN - London OWD - psmp-gn-owd-lon2-uk.geant.org", "value":"psmp-gn-owd-lon2-uk.geant.org"},
+      {"label":"GN - Budapest BW - psmp-gn-bw-bud-hu.geant.org", "value":"psmp-gn-bw-bud-hu.geant.org"},
+      {"label":"GN - Budapest OWD - psmp-gn-owd-bud-hu.geant.org", "value":"psmp-gn-owd-bud-hu.geant.org"},
+      {"label":"GN - Vienna BW - psmp-gn-bw-vie-at.geant.org", "value":"psmp-gn-bw-vie-at.geant.org"},
+      {"label":"GN - Vienna OWD - psmp-gn-owd-vie-at.geant.org", "value":"psmp-gn-owd-vie-at.geant.org"},
     ]
   },
   tests: [
