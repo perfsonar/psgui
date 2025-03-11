@@ -12,13 +12,14 @@ class Selects extends Component {
     let search = window.location.search;
     let params = new URLSearchParams(search);
     let source = params.get('source');
+    let destination = params.get('destination');
 
     this.state = {
       error: null,
       isLoaded: false,
       sourceOption: source,
       nodeoptions: [],
-      destOption: "",
+      destOption: destination,
       sErr: false,
       dErr: false
     };
@@ -127,15 +128,21 @@ class Selects extends Component {
           this.setState({
             isLoaded: true,
             nodeoptions: options,
-            sourceOption: options.filter(option => option.value === this.state.sourceOption)[0]
+            sourceOption: options.filter(option => option.value === this.state.sourceOption)[0],
+            destOption: options.filter(option => option.value === this.state.destOption)[0]
           }, async () => {
                 await this.handleDestError();
                 await this.handleSourceError();
-                let initialval = '';
+                let sourceinitialval = '';
+                let destinitialval = '';
                 if(typeof this.state.sourceOption === 'object' && this.state.sourceOption !== null) {
-                  initialval = this.state.sourceOption.value;
+                  sourceinitialval = this.state.sourceOption.value;
                 }
-                this.props.handleformdatachange('select-source', initialval);
+                this.props.handleformdatachange('select-source', sourceinitialval);
+                if(typeof this.state.destOption === 'object' && this.state.destOption !== null) {
+                  destinitialval = this.state.destOption.value;
+                }
+                this.props.handleformdatachange('select-dest', destinitialval);
               });
         },
         (error) => {
