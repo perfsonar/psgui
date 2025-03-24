@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { LineChart, Line, ReferenceLine, ReferenceArea, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import { LineChart, Line,  CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 
 const formatter = (value, name, props) => {
   let formattedName = props.payload['y']
