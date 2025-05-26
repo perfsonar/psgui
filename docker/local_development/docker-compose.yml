@@ -4,9 +4,8 @@ services:
   psproxy:
     build: psproxy
     command: ["flask", "run", "--host=0.0.0.0"]
-    stdin_open: true
     volumes:
-      - ./psproxy/custom_config.py:/psproxy/config.py
+      - ./psproxy:/psproxy
     environment:
       - FLASK_ENV=development
       - FLASK_APP=app.py
@@ -14,12 +13,14 @@ services:
       - "5000:5000"
 
   psgui:
+    build: psgui
     environment:
       NODE_ENV: development
-    build: psgui
     volumes:
-      - ./psgui/custom_TestDefaultValues.js:/psgui/src/includes/TestDefaultValues.js
+      # mount current dir into docker container
+      - ./psgui:/psgui
+      # ignore local node_modules, use container
+      - /psgui/node_modules
     stdin_open: true
-    command: yarn start
     ports:
-      - 3000:3000
+      - "3000:3000"

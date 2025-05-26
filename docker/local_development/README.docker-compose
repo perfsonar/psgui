@@ -9,6 +9,12 @@ Clone latest psgui from github:
 
 git clone https://github.com/perfsonar/psgui.git
 
+Clone latest psproxy from github:
+git clone https://github.com/perfsonar/psproxy.git
+
+Add the docker-compose.yml file that is inside the local_development directory
+ in the same directory that contains both psgui/ and psproxy/ folders.
+
 Enter docker subdirectory. There are two config files in two subdirectories.
 You can leave everything as it is if you want to try it with GÉANT PMP nodes.
 
