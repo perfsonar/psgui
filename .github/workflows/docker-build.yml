@@ -39,4 +39,4 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/psgui:latest
 
       - name: Echo image target
-        run: echo "Image will be pushed to: ghcr.io/${{ github.repository_owner }}/psgui"
+        run: 'echo "Image will be pushed to: ghcr.io/${{ github.repository_owner }}/psgui"'
