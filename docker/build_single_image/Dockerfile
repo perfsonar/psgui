@@ -15,7 +15,7 @@ WORKDIR /psproxy
 RUN git clone https://github.com/perfsonar/psproxy.git . && \
     pip install -r requirements.txt
 #ENV FLASK_ENV=development
-COPY custom_config.py /psproxy/config.py
+COPY example_config.py /psproxy/config.py
 
 # Install Node.js, Yarn, git, and Nginx
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
