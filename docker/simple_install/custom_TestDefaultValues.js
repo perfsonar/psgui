@@ -1,5 +1,5 @@
 const TestDefaultValues = {
-  maddash_url: 'https://pmp-central.geant.org/maddash-webui/',
+  maddash_url: 'https://pmp-archive.geant.org/',
   apiurl_nodes: 'https://localhost/api/nodes',
   apiurl_run: 'https://localhost/api/runm',
   apiurl_firstrunhref: 'https://localhost/api/getfirstrun',

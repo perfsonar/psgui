@@ -1,1 +1,1 @@
-FROM cnljubomir/psgui:v1.4
+FROM ghcr.io/perfsonar/psgui:latest
