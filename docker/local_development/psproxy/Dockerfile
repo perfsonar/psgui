@@ -3,7 +3,7 @@
 FROM python:3.9
 
 WORKDIR /psproxy
-RUN git clone https://github.com/perfsonar/psproxy.git .
+#RUN git clone https://github.com/perfsonar/psproxy.git .
 
 RUN pip install -r ./requirements.txt
 

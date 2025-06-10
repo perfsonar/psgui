@@ -6,7 +6,7 @@ RUN apk add git
 
 WORKDIR /psgui
 
-RUN git clone https://github.com/perfsonar/psgui.git .
+#RUN git clone https://github.com/perfsonar/psgui.git .
 
 # Cache and Install dependencies
 # COPY package.json .
