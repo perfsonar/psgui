@@ -5,7 +5,7 @@ import Countdown from '../containers/Countdown';
 import DrawResults from '../containers/DrawResults';
 import { Button } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
-import { Redirect } from 'react-router'
+import { Navigate, useParams } from 'react-router-dom'
 
 let abortController;
 export { abortController };
@@ -250,10 +250,7 @@ class GetResults extends Component {
       );
     }
     else if (this.state.actionCanceled) {
-      return <Redirect push to={{
-        pathname:'/runmeasurement'
-      }}
-      />
+      return <Navigate to="/runmeasurement" replace />;
     }
     else if (this.state.failedstate) {
       return (
@@ -273,4 +270,19 @@ class GetResults extends Component {
     }
   }
 }
-export default GetResults;
+
+function GetResultsWrapper(props) {
+  // get route params from React Router v6
+  const { urlparam } = useParams();
+
+  // emulate the old `match` object React Router v5 used to inject
+  const match = {
+    params: {
+      urlparam,
+    },
+  };
+
+  return <GetResults {...props} match={match} />;
+}
+
+export default GetResultsWrapper;

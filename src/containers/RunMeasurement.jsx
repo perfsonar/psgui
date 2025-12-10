@@ -5,7 +5,7 @@ import TestParams from '../containers/TestParams';
 import Selects from '../containers/Selects';
 import { Button } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router'
 
 let abortController;
 export { abortController };
@@ -238,7 +238,7 @@ class RunMeasurement extends Component {
   render() {
     if (this.state.resultFetched) {
         //~ state: {state: this.state},
-      return <Redirect push to={{
+      return <Navigate push to={{
         pathname:'/GetResults/' + encodeURIComponent(this.state.firstRunHref)
       }}
       />

@@ -5,7 +5,7 @@ import Links from './Links.js';
 import Page404 from './Page404.js';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TestDefaultValues from './includes/TestDefaultValues.js';
 
 class App extends Component {
@@ -15,16 +15,12 @@ class App extends Component {
     <Router>
       <div className="App">
         <Links />
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/runmeasurement" component={RunMeasurement} />
-          <Route path="/getresults/:urlparam" component={GetResults} />
-          <Route path="*">
-            <Page404 />
-          </Route>
-        </Switch>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/runmeasurement" element={<RunMeasurement />} />
+          <Route path="/getresults/:urlparam" element={<GetResults />} />
+          <Route path="*" element={<Page404 />} />
+        </Routes>
       </div>
     </Router>
     );
