@@ -29,7 +29,7 @@ class TestParams extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.options !== prevProps.options) {
-      this.setState({
+        this.setState({
         testoptions: this.props.defoptions.filter(f => this.props.options.includes(f.value)),
       });
     }
@@ -54,17 +54,14 @@ class TestParams extends Component {
     }
   }
 
-  handleTestChange = async testOption => {
-    await this.setState({
-      testOption
-    });
-    this.props.handleformdatachange('select-test', testOption.value);
+  handleTestChange = (testOption) => {
+    this.setState({ testOption });
+    const nextValue = testOption?.value ?? '';
+    this.props.handleformdatachange('select-test', nextValue);
   };
 
-  handleIPVersionChange = async value => {
-    await this.setState({
-      ipVersion: value
-    });
+  handleIPVersionChange = (value) => {
+    this.setState({ ipVersion: value });
     this.props.handleformdatachange('select-ipversion', value);
   };
 
