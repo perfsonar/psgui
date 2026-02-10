@@ -6,7 +6,13 @@ import Latency from '../containers/Latency';
 import Throughput from '../containers/Throughput';
 import Rtt from '../containers/Rtt';
 import Trace from '../containers/Trace';
-import {RadioGroup, Radio} from 'react-radio-group'
+import RadioGroupNative from "../components/RadioGroupNative";
+
+const ipOptions = [
+  { value: "4", label: "IPv4" },
+  { value: "6", label: "IPv6" },
+];
+
 
 class TestParams extends Component {
 
@@ -117,10 +123,17 @@ class TestParams extends Component {
               </div>
               <div className="row">
                 <div className="col-md-6">
-                  <RadioGroup name="ipversion" selectedValue={this.state.ipVersion} onChange={this.handleIPVersionChange}>
-                      <Radio value="4" className="inlinerow" /> IPv4
-                      <Radio value="6" className="inlinerow" /> IPv6
-                  </RadioGroup>
+                  <RadioGroupNative
+                    name="ipversion"
+                    value={this.state.ipVersion}
+                    onChange={this.handleIPVersionChange}
+                    className="ipversion-inline"
+                    inputClassName="inlinerow"
+                    options={[
+                      { value: "4", label: "IPv4" },
+                      { value: "6", label: "IPv6" },
+                    ]}
+                  />
                 </div>
               </div>
               {this.renderSelectedTest(this.state.testOption)}

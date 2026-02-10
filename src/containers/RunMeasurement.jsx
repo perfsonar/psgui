@@ -4,8 +4,8 @@ import TestDefaultValues from '../includes/TestDefaultValues.js';
 import TestParams from '../containers/TestParams';
 import Selects from '../containers/Selects';
 import { Button } from 'react-bootstrap';
-import LoadingOverlay from 'react-loading-overlay';
 import { Navigate } from 'react-router-dom'
+import LoadingOverlay from "../components/LoadingOverlay";
 
 let abortController;
 export { abortController };

@@ -4,15 +4,12 @@ import TestDefaultValues from '../includes/TestDefaultValues.js';
 import Countdown from '../containers/Countdown';
 import DrawResults from '../containers/DrawResults';
 import { Button } from 'react-bootstrap';
-import LoadingOverlay from 'react-loading-overlay';
 import { Navigate, useParams } from 'react-router-dom'
+import LoadingOverlay from "../components/LoadingOverlay";
+
 
 let abortController;
 export { abortController };
-
-//~ https://github.com/derrickpelletier/react-loading-overlay/pull/57#issuecomment-1054194254
-LoadingOverlay.propTypes = undefined;
-
 class LoaderText extends Component {
   render() {
     if(this.props.waittime) {
