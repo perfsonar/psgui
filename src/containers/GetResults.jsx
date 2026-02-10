@@ -212,8 +212,6 @@ class GetResults extends Component {
             active={this.state.fetchLoading}
             text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
           >
-            <div className="overlay">
-            </div>
           </LoadingOverlay>
         </div>
       );
@@ -226,8 +224,6 @@ class GetResults extends Component {
             active={this.state.waitingOverlay}
             text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} />
           >
-            <div className="overlay">
-            </div>
           </LoadingOverlay>
         </div>
       );
@@ -240,8 +236,6 @@ class GetResults extends Component {
             active={this.state.fetchresults}
             text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
           >
-            <div className="overlay">
-            </div>
           </LoadingOverlay>;
         </div>
       );

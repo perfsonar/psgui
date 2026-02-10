@@ -239,11 +239,8 @@ class RunMeasurement extends Component {
 
   render() {
     if (this.state.resultFetched) {
-        //~ state: {state: this.state},
-      return <Navigate push to={{
-        pathname:'/GetResults/' + encodeURIComponent(this.state.firstRunHref)
-      }}
-      />
+        const urlparam = encodeURIComponent(this.state.firstRunHref);
+        return <Navigate to={`/getresults/${urlparam}`} replace />;
     }
     else {
       return (

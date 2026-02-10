@@ -3,19 +3,21 @@ import React from "react";
 
 export default function LoadingOverlay({ active, text, children }) {
   return (
-    <div style={{ position: "relative" }}>
+    <div>
       {children}
 
       {active && (
         <div
           style={{
-            position: "absolute",
+            position: "fixed",
             inset: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(112,112,112,0.7)",
+            background: "rgba(33, 33, 33, 0.7)",
             zIndex: 10,
+            color: "rgba(221, 221, 221, 0.7)",
+
           }}
         >
           <div style={{ textAlign: "center" }}>
