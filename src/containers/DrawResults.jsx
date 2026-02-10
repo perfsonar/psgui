@@ -236,6 +236,7 @@ class DrawResults extends Component {
       );
     }
     else if (this.props.results.testtype === 'rtt') {
+      console.log(this.props.results);
       return (
         <div>
           <h3>{this.props.results.tr.test.type}: {this.props.results.tr.test.spec.source} -> {this.props.results.tr.test.spec.dest} ({this.props.results.tr.tool})</h3>

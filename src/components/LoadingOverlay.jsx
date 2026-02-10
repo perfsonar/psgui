@@ -16,7 +16,7 @@ export default function LoadingOverlay({ active, text, children }) {
             justifyContent: "center",
             background: "rgba(33, 33, 33, 0.7)",
             zIndex: 10,
-            color: "rgba(221, 221, 221, 0.7)",
+            color: "rgba(240, 240, 240, 0.7)",
 
           }}
         >

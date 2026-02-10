@@ -47,28 +47,52 @@ function Table({ columns, data }) {
   return (
     <table {...getTableProps()}>
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
-          prepareRow(row)
+        {headerGroups.map((headerGroup) => {
+          const hgProps = headerGroup.getHeaderGroupProps();
+          const { key: hgKey, ...hgRest } = hgProps;
+
           return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map(cell => {
-                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+            <tr key={hgKey} {...hgRest}>
+              {headerGroup.headers.map((column) => {
+                const colProps = column.getHeaderProps();
+                const { key: colKey, ...colRest } = colProps;
+
+                return (
+                  <th key={colKey} {...colRest}>
+                    {column.render("Header")}
+                  </th>
+                );
               })}
             </tr>
-          )
+          );
+        })}
+      </thead>
+
+      <tbody {...getTableBodyProps()}>
+        {rows.map((row) => {
+          prepareRow(row);
+
+          const rowProps = row.getRowProps();
+          const { key: rowKey, ...rowRest } = rowProps;
+
+          return (
+            <tr key={rowKey} {...rowRest}>
+              {row.cells.map((cell) => {
+                const cellProps = cell.getCellProps();
+                const { key: cellKey, ...cellRest } = cellProps;
+
+                return (
+                  <td key={cellKey} {...cellRest}>
+                    {cell.render("Cell")}
+                  </td>
+                );
+              })}
+            </tr>
+          );
         })}
       </tbody>
     </table>
-  )
+  );
 }
 
 class ReTable extends Component {

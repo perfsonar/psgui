@@ -8,8 +8,6 @@ import { Navigate, useParams } from 'react-router-dom'
 import LoadingOverlay from "../components/LoadingOverlay";
 
 
-let abortController;
-export { abortController };
 class LoaderText extends Component {
   render() {
     if(this.props.waittime) {
@@ -61,6 +59,8 @@ class LoaderText extends Component {
 
 class GetResults extends Component {
 
+  abortController = new AbortController();
+
   constructor(props) {
     super(props);
 
@@ -89,15 +89,23 @@ class GetResults extends Component {
 
   abortFetching = async () => {
     console.log('Aborting...');
-    abortController.abort();
+    this.abortController.abort();
     await this.setState({
       fetchLoading: false,
       fetchresults: false,
     });
   }
 
-  continueAction = async () => {
-    await this.setState({
+  isAbortError = (err) => 
+    err?.name === "AbortError" ||
+    err?.code === 20 ||
+    String(err).toLowerCase().includes("aborted");
+  
+
+  continueAction = () => {
+    this.abortController = new AbortController();
+
+    this.setState({
       waitingOverlay: false,
       fetchresults: true,
     });
@@ -106,15 +114,17 @@ class GetResults extends Component {
     if (process.env.NODE_ENV !== 'production') {
       apiurl = TestDefaultValues.devapiurl_resultshref;
     }
-    this.doFetchFirstRun(apiurl, 10)
-      .catch(error => console.log(error));
+    this.doFetchFirstRun(apiurl, 10).catch((err) => {
+      if (this.isAbortError(err)) return;
+      console.error(err);
+    });    
   }
 
   doFetchFirstRun = (url, limit) =>
     fetch(
       url, {
         method: 'POST',
-        signal: abortController.signal,
+        signal: this.abortController.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.state.firstRunHref)
       }
@@ -141,6 +151,10 @@ class GetResults extends Component {
         });
       }
       return r;
+    })
+    .catch(err => {
+      if (this.isAbortError(err)) return; // ignore aborts
+      throw err;
     });
 
   cancelAction = async () => {
@@ -152,8 +166,8 @@ class GetResults extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this.abortController = new AbortController();
 
-    abortController = new AbortController();
     let apiurl = TestDefaultValues.apiurl_firstrunhref;
     if (process.env.NODE_ENV !== 'production') {
       apiurl = TestDefaultValues.devapiurl_firstrunhref;
@@ -162,7 +176,7 @@ class GetResults extends Component {
     fetch(
       apiurl, {
         method: 'POST',
-        signal: abortController.signal,
+        signal: this.abortController.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.state.firstRunHref)
       }
@@ -196,10 +210,16 @@ class GetResults extends Component {
           });
         }
     })
+    .catch(err => {
+      if (this.isAbortError(err)) return; // ignore aborts
+      console.error(err);
+      this.setState({ fetchLoading: false, failedstate: true, failedreason: String(err) });
+    });    
   }
 
   componentWillUnmount() {
     this._isMounted = false;
+    if (this.abortController) this.abortController.abort();
   }
 
   render() {
@@ -210,7 +230,7 @@ class GetResults extends Component {
           <LoadingOverlay
             spinner
             active={this.state.fetchLoading}
-            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
+            text = {<LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} fetchresults={this.state.fetchresults} />}
           >
           </LoadingOverlay>
         </div>
@@ -222,7 +242,7 @@ class GetResults extends Component {
           <LoadingOverlay
             spinner
             active={this.state.waitingOverlay}
-            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} />
+            text = {<LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} fetchresults={this.state.fetchresults} />}
           >
           </LoadingOverlay>
         </div>
@@ -234,9 +254,9 @@ class GetResults extends Component {
           <LoadingOverlay
             spinner
             active={this.state.fetchresults}
-            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
+            text = {<LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} fetchresults={this.state.fetchresults} />}
           >
-          </LoadingOverlay>;
+          </LoadingOverlay>
         </div>
       );
     }
