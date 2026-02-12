@@ -79,6 +79,7 @@ class GetResults extends Component {
       failedstate: false,
       failedreason: '',
       fetchresults: false,
+      fetchError: null,
       results: '',
     };
 
@@ -108,54 +109,101 @@ class GetResults extends Component {
     this.setState({
       waitingOverlay: false,
       fetchresults: true,
+      fetchError: null,
     });
 
     let apiurl = TestDefaultValues.apiurl_resultshref;
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       apiurl = TestDefaultValues.devapiurl_resultshref;
     }
-    this.doFetchFirstRun(apiurl, 10).catch((err) => {
-      if (this.isAbortError(err)) return;
-      console.error(err);
-    });    
-  }
 
-  doFetchFirstRun = (url, limit) =>
-    fetch(
-      url, {
-        method: 'POST',
-        signal: this.abortController.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.state.firstRunHref)
-      }
-    )
-    .then(res => res.json())
-    .then(r => {
-      if(r["state"] !== 'finished' && --limit) {
-        let fr = r["state-display"]
-        if(r["state-display"] === 'Pending' || r["state-display"] === 'Running' || r["state-display"] === 'Cleanup' || r["state-display"] === 'On Deck') {
-          fr = fr + ' - Please try to refresh this page in couple of seconds'
+    this.doFetchFirstRun(apiurl, 3)
+      .catch((err) => {
+        if (this.isAbortError(err)) return;
+
+        console.error(err);
+        this.setState({
+          fetchError: err?.message || "Failed to fetch results. Please try again.",
+        });
+      })
+      .finally(() => {
+        // always clear spinner unless request was aborted and you intentionally want it to stay
+        this.setState({ fetchresults: false });
+      });
+  };
+
+  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  doFetchFirstRun = async (url, limit) => {
+    try {
+      while (limit > 0) {
+        const res = await fetch(url, {
+          method: "POST",
+          signal: this.abortController.signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.state.firstRunHref),
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
         }
+
+        const r = await res.json();
+
+        // Finished → success
+        if (r["state"] === "finished") {
+          this.setState({
+            fetchresults: false,
+            finishedstate: true,
+            failedstate: false,
+            failedreason: null,
+            results: r["result"],
+          });
+          return r;
+        }
+
+        // Not finished yet → wait and try again
+        limit -= 1;
+        if (limit > 0) {
+          await this.sleep(200);
+          continue;
+        }
+
+        // Out of retries → treat as failure (but not a crash)
+        let fr = r["state-display"] || r["state"] || "Not finished";
+        if (
+          fr === "Pending" ||
+          fr === "Running" ||
+          fr === "Cleanup" ||
+          fr === "On Deck"
+        ) {
+          fr = `${fr} - Please refresh this page in a couple of seconds`;
+        }
+
         this.setState({
           fetchresults: false,
           failedstate: true,
+          finishedstate: false,
           failedreason: fr,
           results: r["result"],
         });
+        return r;
       }
-      else {
-        this.setState({
-          fetchresults: false,
-          finishedstate: true,
-          results: r["result"],
-        });
-      }
-      return r;
-    })
-    .catch(err => {
+    } catch (err) {
       if (this.isAbortError(err)) return; // ignore aborts
-      throw err;
-    });
+
+      // Ensure spinner stops and show a real failure state
+      this.setState({
+        fetchresults: false,
+        failedstate: true,
+        finishedstate: false,
+        failedreason: err?.message || "Failed to fetch results.",
+      });
+
+      throw err; // optional: rethrow if caller wants it
+    }
+  };
+
 
   cancelAction = async () => {
     await this.setState({

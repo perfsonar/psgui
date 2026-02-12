@@ -22,7 +22,7 @@ export default function LoadingOverlay({ active, text, children }) {
         >
           <div style={{ textAlign: "center" }}>
             <div
-              className="spinner-border text-primary"
+              className="spinner-border text-white"
               role="status"
               aria-label="Loading"
             />
