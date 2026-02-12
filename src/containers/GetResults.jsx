@@ -4,14 +4,9 @@ import TestDefaultValues from '../includes/TestDefaultValues.js';
 import Countdown from '../containers/Countdown';
 import DrawResults from '../containers/DrawResults';
 import { Button } from 'react-bootstrap';
-import LoadingOverlay from 'react-loading-overlay';
-import { Redirect } from 'react-router'
+import { Navigate, useParams } from 'react-router-dom'
+import LoadingOverlay from "../components/LoadingOverlay";
 
-let abortController;
-export { abortController };
-
-//~ https://github.com/derrickpelletier/react-loading-overlay/pull/57#issuecomment-1054194254
-LoadingOverlay.propTypes = undefined;
 
 class LoaderText extends Component {
   render() {
@@ -64,6 +59,8 @@ class LoaderText extends Component {
 
 class GetResults extends Component {
 
+  abortController = new AbortController();
+
   constructor(props) {
     super(props);
 
@@ -82,6 +79,7 @@ class GetResults extends Component {
       failedstate: false,
       failedreason: '',
       fetchresults: false,
+      fetchError: null,
       results: '',
     };
 
@@ -92,59 +90,120 @@ class GetResults extends Component {
 
   abortFetching = async () => {
     console.log('Aborting...');
-    abortController.abort();
+    this.abortController.abort();
     await this.setState({
       fetchLoading: false,
       fetchresults: false,
     });
   }
 
-  continueAction = async () => {
-    await this.setState({
+  isAbortError = (err) => 
+    err?.name === "AbortError" ||
+    err?.code === 20 ||
+    String(err).toLowerCase().includes("aborted");
+  
+
+  continueAction = () => {
+    this.abortController = new AbortController();
+
+    this.setState({
       waitingOverlay: false,
       fetchresults: true,
+      fetchError: null,
     });
 
     let apiurl = TestDefaultValues.apiurl_resultshref;
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       apiurl = TestDefaultValues.devapiurl_resultshref;
     }
-    this.doFetchFirstRun(apiurl, 10)
-      .catch(error => console.log(error));
-  }
 
-  doFetchFirstRun = (url, limit) =>
-    fetch(
-      url, {
-        method: 'POST',
-        signal: abortController.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.state.firstRunHref)
-      }
-    )
-    .then(res => res.json())
-    .then(r => {
-      if(r["state"] !== 'finished' && --limit) {
-        let fr = r["state-display"]
-        if(r["state-display"] === 'Pending' || r["state-display"] === 'Running' || r["state-display"] === 'Cleanup' || r["state-display"] === 'On Deck') {
-          fr = fr + ' - Please try to refresh this page in couple of seconds'
+    this.doFetchFirstRun(apiurl, 3)
+      .catch((err) => {
+        if (this.isAbortError(err)) return;
+
+        console.error(err);
+        this.setState({
+          fetchError: err?.message || "Failed to fetch results. Please try again.",
+        });
+      })
+      .finally(() => {
+        // always clear spinner unless request was aborted and you intentionally want it to stay
+        this.setState({ fetchresults: false });
+      });
+  };
+
+  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  doFetchFirstRun = async (url, limit) => {
+    try {
+      while (limit > 0) {
+        const res = await fetch(url, {
+          method: "POST",
+          signal: this.abortController.signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.state.firstRunHref),
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
         }
+
+        const r = await res.json();
+
+        // Finished → success
+        if (r["state"] === "finished") {
+          this.setState({
+            fetchresults: false,
+            finishedstate: true,
+            failedstate: false,
+            failedreason: null,
+            results: r["result"],
+          });
+          return r;
+        }
+
+        // Not finished yet → wait and try again
+        limit -= 1;
+        if (limit > 0) {
+          await this.sleep(200);
+          continue;
+        }
+
+        // Out of retries → treat as failure (but not a crash)
+        let fr = r["state-display"] || r["state"] || "Not finished";
+        if (
+          fr === "Pending" ||
+          fr === "Running" ||
+          fr === "Cleanup" ||
+          fr === "On Deck"
+        ) {
+          fr = `${fr} - Please refresh this page in a couple of seconds`;
+        }
+
         this.setState({
           fetchresults: false,
           failedstate: true,
+          finishedstate: false,
           failedreason: fr,
           results: r["result"],
         });
+        return r;
       }
-      else {
-        this.setState({
-          fetchresults: false,
-          finishedstate: true,
-          results: r["result"],
-        });
-      }
-      return r;
-    });
+    } catch (err) {
+      if (this.isAbortError(err)) return; // ignore aborts
+
+      // Ensure spinner stops and show a real failure state
+      this.setState({
+        fetchresults: false,
+        failedstate: true,
+        finishedstate: false,
+        failedreason: err?.message || "Failed to fetch results.",
+      });
+
+      throw err; // optional: rethrow if caller wants it
+    }
+  };
+
 
   cancelAction = async () => {
     await this.setState({
@@ -155,8 +214,8 @@ class GetResults extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this.abortController = new AbortController();
 
-    abortController = new AbortController();
     let apiurl = TestDefaultValues.apiurl_firstrunhref;
     if (process.env.NODE_ENV !== 'production') {
       apiurl = TestDefaultValues.devapiurl_firstrunhref;
@@ -165,7 +224,7 @@ class GetResults extends Component {
     fetch(
       apiurl, {
         method: 'POST',
-        signal: abortController.signal,
+        signal: this.abortController.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.state.firstRunHref)
       }
@@ -199,10 +258,16 @@ class GetResults extends Component {
           });
         }
     })
+    .catch(err => {
+      if (this.isAbortError(err)) return; // ignore aborts
+      console.error(err);
+      this.setState({ fetchLoading: false, failedstate: true, failedreason: String(err) });
+    });    
   }
 
   componentWillUnmount() {
     this._isMounted = false;
+    if (this.abortController) this.abortController.abort();
   }
 
   render() {
@@ -213,10 +278,8 @@ class GetResults extends Component {
           <LoadingOverlay
             spinner
             active={this.state.fetchLoading}
-            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
+            text = {<LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} fetchresults={this.state.fetchresults} />}
           >
-            <div className="overlay">
-            </div>
           </LoadingOverlay>
         </div>
       );
@@ -227,10 +290,8 @@ class GetResults extends Component {
           <LoadingOverlay
             spinner
             active={this.state.waitingOverlay}
-            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} />
+            text = {<LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} waittime={this.state.waitSeconds} fetchresults={this.state.fetchresults} />}
           >
-            <div className="overlay">
-            </div>
           </LoadingOverlay>
         </div>
       );
@@ -241,19 +302,14 @@ class GetResults extends Component {
           <LoadingOverlay
             spinner
             active={this.state.fetchresults}
-            text = <LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} />
+            text = {<LoaderText cancelAction={this.cancelAction} continueAction={this.continueAction} abfetch={this.abortFetching} fetchresults={this.state.fetchresults} />}
           >
-            <div className="overlay">
-            </div>
-          </LoadingOverlay>;
+          </LoadingOverlay>
         </div>
       );
     }
     else if (this.state.actionCanceled) {
-      return <Redirect push to={{
-        pathname:'/runmeasurement'
-      }}
-      />
+      return <Navigate to="/runmeasurement" replace />;
     }
     else if (this.state.failedstate) {
       return (
@@ -273,4 +329,19 @@ class GetResults extends Component {
     }
   }
 }
-export default GetResults;
+
+function GetResultsWrapper(props) {
+  // get route params from React Router v6
+  const { urlparam } = useParams();
+
+  // emulate the old `match` object React Router v5 used to inject
+  const match = {
+    params: {
+      urlparam,
+    },
+  };
+
+  return <GetResults {...props} match={match} />;
+}
+
+export default GetResultsWrapper;

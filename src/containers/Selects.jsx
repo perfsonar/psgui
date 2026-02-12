@@ -65,42 +65,44 @@ class Selects extends Component {
     }
   }
 
-  handleToggleClick() {
-    let revSource = this.state.destOption;
-    let revDest = this.state.sourceOption;
-    this.setState(state => ({
-      sourceOption: revSource,
-      destOption: revDest,
-    }), async () => {
-      await this.handleDestError();
-      await this.handleSourceError();
-      let initialSOval = '';
-      if(typeof this.state.sourceOption === 'object' && this.state.sourceOption !== null) {
-        initialSOval = this.state.sourceOption.value;
-      }
-      this.props.handleformdatachange('select-source', initialSOval);
-      let initialDOval = '';
-      if(typeof this.state.destOption === 'object' && this.state.destOption !== null) {
-        initialDOval = this.state.destOption.value;
-      }
-      this.props.handleformdatachange('select-dest', initialDOval);
-    });
-  }
+  handleToggleClick = () => {
+    const revSource = this.state.destOption;
+    const revDest = this.state.sourceOption;
 
-  handleDestChange = async destOption => {
-    await this.setState({
-      destOption
-    });
-    this.handleDestError();
-    this.props.handleformdatachange('select-dest', destOption.value);
+    this.setState(
+      { sourceOption: revSource, destOption: revDest },
+      () => {
+        this.handleDestError();
+        this.handleSourceError();
+
+        this.props.handleformdatachange(
+          "select-source",
+          revSource && typeof revSource === "object" ? revSource.value : ""
+        );
+
+        this.props.handleformdatachange(
+          "select-dest",
+          revDest && typeof revDest === "object" ? revDest.value : ""
+        );
+      }
+    );
   };
 
-  handleSourceChange = async sourceOption => {
-    await this.setState({
-      sourceOption
+  handleDestChange = (destOption) => {
+    this.setState({ destOption }, this.handleDestError);
+    const nextValue = destOption?.value ?? '';
+    this.props.handleformdatachange('select-dest', nextValue);
+  };
+
+  handleSourceChange = (sourceOption) => {
+    this.setState({ sourceOption }, () => {
+      this.handleSourceError();
+      const nextValue = sourceOption?.value ?? '';
+      this.props.handleformdatachange(
+        'select-source',
+        nextValue
+      );
     });
-    this.handleSourceError();
-    this.props.handleformdatachange('select-source', this.state.sourceOption.value);
   };
 
   componentDidMount() {

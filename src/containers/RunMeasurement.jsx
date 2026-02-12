@@ -4,8 +4,8 @@ import TestDefaultValues from '../includes/TestDefaultValues.js';
 import TestParams from '../containers/TestParams';
 import Selects from '../containers/Selects';
 import { Button } from 'react-bootstrap';
-import LoadingOverlay from 'react-loading-overlay';
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router-dom'
+import LoadingOverlay from "../components/LoadingOverlay";
 
 let abortController;
 export { abortController };
@@ -61,29 +61,31 @@ class RunMeasurement extends Component {
     this.validateFormError = this.validateFormError.bind(this);
     this.formValidate = this.formValidate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.doFetchAvailableTests = this.doFetchAvailableTests.bind(this);
+    this.fetchAndSetAvailableTests = this.fetchAndSetAvailableTests.bind(this);
   }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
-  handleFormDataChange = async (name, value) => {
-    var newFormData = this.state.formData;
-    Object.assign(newFormData, {[name]: value});
-    Object.keys(newFormData).forEach(key => ( newFormData[key] === undefined || newFormData[key] === null) && delete newFormData[key])
-    await this.setState({ formData : newFormData });
-    //after both source and dest are chosen filter default options and choose right tests to populate select test field
-    if(this.state.formData['select-source'] && this.state.formData['select-dest']) {
-      //~ console.log(this.state.formData)
-      let apiurl = TestDefaultValues.apiurl_testshref;
-      if (process.env.NODE_ENV !== 'production') {
-        apiurl = TestDefaultValues.devapiurl_testshref;
+  handleFormDataChange = (name, value) => {
+    const newFormData = { ...this.state.formData, [name]: value };
+
+    Object.keys(newFormData).forEach((key) => {
+      if (newFormData[key] == null) delete newFormData[key]; // matches null or undefined
+    });
+
+    this.setState({ formData: newFormData }, async () => {
+      if (this.state.formData["select-source"] && this.state.formData["select-dest"]) {
+        let apiurl = TestDefaultValues.apiurl_testshref;
+        if (process.env.NODE_ENV !== "production") {
+          apiurl = TestDefaultValues.devapiurl_testshref;
+        }
+
+        await this.fetchAndSetAvailableTests(apiurl);
       }
-      const tests = await this.doFetchAvailableTests(apiurl);
-      const filteredArray = this.state.options.filter(value => this.state.options.includes(value));
-    }
-  }
+    });
+  };
 
   addFormError = (field) => {
     const index = this.state.formErr.indexOf(field);
@@ -145,7 +147,7 @@ class RunMeasurement extends Component {
 
   }
 
-  doFetchAvailableTests = async (url) => {
+  fetchAndSetAvailableTests = async (url) => {
     abortController = new AbortController();
     await this.setState({
       fetchTests: true,
@@ -237,11 +239,8 @@ class RunMeasurement extends Component {
 
   render() {
     if (this.state.resultFetched) {
-        //~ state: {state: this.state},
-      return <Redirect push to={{
-        pathname:'/GetResults/' + encodeURIComponent(this.state.firstRunHref)
-      }}
-      />
+        const urlparam = encodeURIComponent(this.state.firstRunHref);
+        return <Navigate to={`/getresults/${urlparam}`} replace />;
     }
     else {
       return (
