@@ -4,7 +4,7 @@ import TestDefaultValues from '../includes/TestDefaultValues.js';
 import Countdown from '../containers/Countdown';
 import DrawResults from '../containers/DrawResults';
 import { Button } from 'react-bootstrap';
-import { Navigate, useParams } from 'react-router-dom'
+import { Navigate, useParams, useNavigate } from "react-router-dom";
 import LoadingOverlay from "../components/LoadingOverlay";
 
 
@@ -59,6 +59,8 @@ class LoaderText extends Component {
 
 class GetResults extends Component {
 
+  _isMounted = false;
+
   abortController = new AbortController();
 
   constructor(props) {
@@ -68,8 +70,16 @@ class GetResults extends Component {
 
     const { urlparam } = this.props.match.params;
 
+    let decodedUrl = null;
+
+    try {
+      decodedUrl = decodeURIComponent(urlparam);
+    } catch {
+      decodedUrl = null;
+    }
+
     this.state = {
-      firstRunHref: decodeURIComponent(urlparam),
+      firstRunHref: this.sanitizeHref(decodedUrl),
       waitingOverlay: false,
       actionCanceled: false,
       waitSeconds: 0,
@@ -88,25 +98,25 @@ class GetResults extends Component {
     this.doFetchFirstRun = this.doFetchFirstRun.bind(this);
   }
 
-  abortFetching = async () => {
-    console.log('Aborting...');
-    this.abortController.abort();
-    await this.setState({
-      fetchLoading: false,
-      fetchresults: false,
-    });
-  }
+  safeSetState = (update) => {
+    if (this._isMounted) this.setState(update);
+  };
 
-  isAbortError = (err) => 
+  abortFetching = () => {
+    this.abortController?.abort();
+    this.props.navigate?.("/runmeasurement", { replace: true });
+  };
+
+  isAbortError = (err) =>
     err?.name === "AbortError" ||
     err?.code === 20 ||
     String(err).toLowerCase().includes("aborted");
-  
+
 
   continueAction = () => {
     this.abortController = new AbortController();
 
-    this.setState({
+    this.safeSetState({
       waitingOverlay: false,
       fetchresults: true,
       fetchError: null,
@@ -122,13 +132,12 @@ class GetResults extends Component {
         if (this.isAbortError(err)) return;
 
         console.error(err);
-        this.setState({
+        this.safeSetState({
           fetchError: err?.message || "Failed to fetch results. Please try again.",
         });
       })
       .finally(() => {
-        // always clear spinner unless request was aborted and you intentionally want it to stay
-        this.setState({ fetchresults: false });
+        this.safeSetState({ fetchresults: false });
       });
   };
 
@@ -152,7 +161,7 @@ class GetResults extends Component {
 
         // Finished → success
         if (r["state"] === "finished") {
-          this.setState({
+          this.safeSetState({
             fetchresults: false,
             finishedstate: true,
             failedstate: false,
@@ -180,7 +189,7 @@ class GetResults extends Component {
           fr = `${fr} - Please refresh this page in a couple of seconds`;
         }
 
-        this.setState({
+        this.safeSetState({
           fetchresults: false,
           failedstate: true,
           finishedstate: false,
@@ -193,7 +202,7 @@ class GetResults extends Component {
       if (this.isAbortError(err)) return; // ignore aborts
 
       // Ensure spinner stops and show a real failure state
-      this.setState({
+      this.safeSetState({
         fetchresults: false,
         failedstate: true,
         finishedstate: false,
@@ -205,22 +214,31 @@ class GetResults extends Component {
   };
 
 
-  cancelAction = async () => {
-    await this.setState({
+  cancelAction = () => {
+    this.safeSetState({
       waitingOverlay: false,
       actionCanceled: true,
     });
-  }
+  };
 
   componentDidMount() {
     this._isMounted = true;
+
+    if (!this.state.firstRunHref) {
+      this.safeSetState({
+        failedstate: true,
+        failedreason: "Invalid measurement URL.",
+      });
+      return;
+    }
+
     this.abortController = new AbortController();
 
     let apiurl = TestDefaultValues.apiurl_firstrunhref;
     if (process.env.NODE_ENV !== 'production') {
       apiurl = TestDefaultValues.devapiurl_firstrunhref;
     }
-    this.setState({fetchLoading: true});
+    this.safeSetState({fetchLoading: true});
     fetch(
       apiurl, {
         method: 'POST',
@@ -229,9 +247,15 @@ class GetResults extends Component {
         body: JSON.stringify(this.state.firstRunHref)
       }
     )
-    .then(res => res.json())
-    .then(r => {
-        this.setState({
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        }
+
+        return res.json();
+      })
+      .then(r => {
+        this.safeSetState({
           fetchLoading: false,
           resulthref: r["result-href"]
         });
@@ -245,7 +269,7 @@ class GetResults extends Component {
         let endtime = new Date(servendtime).getTime();
         let timediff = 20 + (endtime - curtime) / 1000;
         if(timediff > 0) {
-          this._isMounted && this.setState({
+          this.safeSetState({
             fetchLoading: false,
             waitingOverlay: true,
             waitSeconds: timediff,
@@ -253,7 +277,7 @@ class GetResults extends Component {
         }
         else {
           this.continueAction();
-          this._isMounted && this.setState({
+          this.safeSetState({
             fetchLoading: false,
           });
         }
@@ -261,14 +285,25 @@ class GetResults extends Component {
     .catch(err => {
       if (this.isAbortError(err)) return; // ignore aborts
       console.error(err);
-      this.setState({ fetchLoading: false, failedstate: true, failedreason: String(err) });
-    });    
+      this.safeSetState({ fetchLoading: false, failedstate: true, failedreason: String(err) });
+    });
   }
 
   componentWillUnmount() {
     this._isMounted = false;
     if (this.abortController) this.abortController.abort();
   }
+
+  sanitizeHref = (raw) => {
+    if (!raw) return null;
+    const s = String(raw).trim();
+
+    // Allow only http/https links (or also allow relative "/")
+    if (s.startsWith("/") && !s.startsWith("//")) return s;
+    if (/^https?:\/\/[^\s]+$/i.test(s)) return s;
+
+    return null;
+  };
 
   render() {
 
@@ -312,8 +347,10 @@ class GetResults extends Component {
       return <Navigate to="/runmeasurement" replace />;
     }
     else if (this.state.failedstate) {
+      const safeHref = this.sanitizeHref(this.state.firstRunHref);
+
       return (
-        <div>Measurement status: {this.state.failedreason} <a href={this.state.firstRunHref}>{this.state.firstRunHref}</a></div>
+        <div>Measurement status: {this.state.failedreason} {safeHref ? <a href={safeHref}>{safeHref}</a> : <span>(invalid link)</span>}</div>
       );
     }
     else if (this.state.finishedstate) {
@@ -324,6 +361,11 @@ class GetResults extends Component {
     else {
       return (
         <div>
+          Something interrupted the request.
+          <br />
+          <Button variant="secondary" onClick={() => this.props.navigate?.("/runmeasurement")}>
+            Go back
+          </Button>
         </div>
       );
     }
@@ -333,6 +375,7 @@ class GetResults extends Component {
 function GetResultsWrapper(props) {
   // get route params from React Router v6
   const { urlparam } = useParams();
+  const navigate = useNavigate();
 
   // emulate the old `match` object React Router v5 used to inject
   const match = {
@@ -341,7 +384,7 @@ function GetResultsWrapper(props) {
     },
   };
 
-  return <GetResults {...props} match={match} />;
+  return <GetResults {...props} match={match} navigate={navigate} />;
 }
 
 export default GetResultsWrapper;
