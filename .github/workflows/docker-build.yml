@@ -3,11 +3,11 @@ name: Build and Push psgui Docker Image
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:  #to allow manual trigger from UI
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:

@@ -18,7 +18,7 @@ RUN git clone https://github.com/perfsonar/psproxy.git . && \
 COPY custom_config.py /psproxy/config.py
 
 # Install Node.js, Yarn, git, and Nginx
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get update && \
     apt-get install -y nodejs && \
     npm install --global yarn
